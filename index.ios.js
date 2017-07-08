@@ -10,7 +10,8 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput
+  TextInput,
+  TouchableOpacity
 } from 'react-native';
 import MapView from 'react-native-maps';
 
@@ -28,8 +29,11 @@ export default class letsGoMetro extends Component {
         longitudeDelta: LONGITUDE_DELTA
       }
     };
+    this.zoomIn = this.zoomIn.bind(this);
+    this.zoomOut = this.zoomOut.bind(this);
   }
 
+  // componentDidUpdate
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(position => {
       console.log(position);
@@ -44,6 +48,37 @@ export default class letsGoMetro extends Component {
     })
   }
 
+  zoomIn(){
+    if (this.state.region.latitudeDelta > 0.01){
+      console.log('INSIDE IF STATEMENT');
+      this.setState({
+        region: {
+          latitude: this.state.region.latitude,
+          longitude: this.state.region.longitude,
+          latitudeDelta: this.state.region.latitudeDelta - 0.005,
+          longitudeDelta: this.state.region.longitudeDelta - 0.005
+        }
+      });
+      console.log(this.state.region.latitudeDelta);
+      console.log(this.state.region.longitudeDelta);
+    }
+  }
+
+  zoomOut(){
+    console.log('CONSOLE LOG PRESS ZOOM OUT');
+    if (this.state.region.latitudeDelta < 1){
+      console.log('INSIDE IF ZOOMOUT STATEMENT');
+      this.setState({
+        region: {
+          latitude: this.state.region.latitude,
+          longitude: this.state.region.longitude,
+          latitudeDelta: this.state.region.latitudeDelta + 0.01,
+          longitudeDelta: this.state.region.longitudeDelta + 0.01
+        }
+      });
+    }
+  }
+
   render() {
     return (
       <View style={{flex: 1, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'stretch'}}>
@@ -55,8 +90,21 @@ export default class letsGoMetro extends Component {
               Hi, I'm Metro Driver. I will help you get where you need to go.
             </Text>
           </View>
+          <View>
+
+          </View>
         </View>
         <View style={styles.container}>
+          <TouchableOpacity onPress={this.zoomIn} style={styles.leftButton}>
+              <View >
+                <Text style={styles.buttonText}>+</Text>
+              </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={this.zoomOut} style={styles.rightButton}>
+              <View >
+                <Text style={styles.buttonText}>-</Text>
+              </View>
+          </TouchableOpacity>
           <MapView
             style={styles.map}
             region={this.state.region}>
@@ -76,6 +124,40 @@ export default class letsGoMetro extends Component {
 }
 
 const styles = StyleSheet.create({
+  leftButton: {
+    // marginBottom: 30,
+    // padding: 10,
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    position: 'absolute',
+    zIndex: 999,
+    top: 10,
+    right: 40,
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: '#AEACBA'
+  },
+  rightButton: {
+    // marginBottom: 30,
+    // padding: 10,
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    position: 'absolute',
+    zIndex: 999,
+    top: 10,
+    right: 18,
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: '#AEACBA'
+  },
+  buttonText: {
+    // padding: 20,
+    color: 'black',
+  },
   information: {
     // ...StyleSheet.absoluteFillObject,
     flex: 0.5,
@@ -113,6 +195,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 0.5,
     borderColor: 'blue',
+    position: 'relative'
   },
   map: {
     ...StyleSheet.absoluteFillObject,
