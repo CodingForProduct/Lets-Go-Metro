@@ -59,15 +59,11 @@ export default class letsGoMetro extends Component {
           longitudeDelta: this.state.region.longitudeDelta - 0.005
         }
       });
-      console.log(this.state.region.latitudeDelta);
-      console.log(this.state.region.longitudeDelta);
     }
   }
 
   zoomOut(){
-    console.log('CONSOLE LOG PRESS ZOOM OUT');
     if (this.state.region.latitudeDelta < 1){
-      console.log('INSIDE IF ZOOMOUT STATEMENT');
       this.setState({
         region: {
           latitude: this.state.region.latitude,
@@ -77,6 +73,8 @@ export default class letsGoMetro extends Component {
         }
       });
     }
+    console.log(this.state.region.latitudeDelta);
+    console.log(this.state.region.longitudeDelta);
   }
 
   render() {
