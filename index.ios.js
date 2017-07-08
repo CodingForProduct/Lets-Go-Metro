@@ -20,10 +20,10 @@ export default class letsGoMetro extends Component {
         <MapView
           style={styles.map}
           region={{
-          latitude: 37.78825,
-          longitude: -122.4324,
-          latitudeDelta: 0.015,
-          longitudeDelta: 0.0121
+          latitude: 34.0498,
+          longitude: -118.2389,
+          latitudeDelta: 0.5,
+          longitudeDelta: 0.45
         }}>
         </MapView>
       </View>
