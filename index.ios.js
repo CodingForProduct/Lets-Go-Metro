@@ -29,7 +29,8 @@ export default class letsGoMetro extends Component {
         longitudeDelta: LONGITUDE_DELTA
       }
     };
-    this.zoom = this.zoom.bind(this);
+    this.zoomIn = this.zoomIn.bind(this);
+    this.zoomOut = this.zoomOut.bind(this);
   }
 
   // componentDidUpdate
@@ -47,8 +48,7 @@ export default class letsGoMetro extends Component {
     })
   }
 
-  zoom(){
-    console.log('CONSOLE LOG PRESS BUTTON');
+  zoomIn(){
     if (this.state.region.latitudeDelta > 0.01){
       console.log('INSIDE IF STATEMENT');
       this.setState({
@@ -61,6 +61,21 @@ export default class letsGoMetro extends Component {
       });
       console.log(this.state.region.latitudeDelta);
       console.log(this.state.region.longitudeDelta);
+    }
+  }
+
+  zoomOut(){
+    console.log('CONSOLE LOG PRESS ZOOM OUT');
+    if (this.state.region.latitudeDelta < 1){
+      console.log('INSIDE IF ZOOMOUT STATEMENT');
+      this.setState({
+        region: {
+          latitude: this.state.region.latitude,
+          longitude: this.state.region.longitude,
+          latitudeDelta: this.state.region.latitudeDelta + 0.01,
+          longitudeDelta: this.state.region.longitudeDelta + 0.01
+        }
+      });
     }
   }
 
@@ -80,12 +95,12 @@ export default class letsGoMetro extends Component {
           </View>
         </View>
         <View style={styles.container}>
-          <TouchableOpacity onPress={this.zoom} style={styles.leftButton}>
+          <TouchableOpacity onPress={this.zoomIn} style={styles.leftButton}>
               <View >
                 <Text style={styles.buttonText}>+</Text>
               </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={this.zoom} style={styles.rightButton}>
+          <TouchableOpacity onPress={this.zoomOut} style={styles.rightButton}>
               <View >
                 <Text style={styles.buttonText}>-</Text>
               </View>
