@@ -10,7 +10,8 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput
+  TextInput,
+  TouchableOpacity
 } from 'react-native';
 import MapView from 'react-native-maps';
 
@@ -30,6 +31,7 @@ export default class letsGoMetro extends Component {
     };
   }
 
+  // componentDidUpdate
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(position => {
       console.log(position);
@@ -44,6 +46,10 @@ export default class letsGoMetro extends Component {
     })
   }
 
+  zoom(){
+    console.log('press button');
+  }
+
   render() {
     return (
       <View style={{flex: 1, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'stretch'}}>
@@ -54,6 +60,13 @@ export default class letsGoMetro extends Component {
             <Text>
               Hi, I'm Metro Driver. I will help you get where you need to go.
             </Text>
+          </View>
+          <View>
+            <TouchableOpacity onPress={this.zoom}>
+              <View style={styles.button}>
+                <Text style={styles.buttonText}>+</Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
         <View style={styles.container}>
@@ -76,6 +89,18 @@ export default class letsGoMetro extends Component {
 }
 
 const styles = StyleSheet.create({
+  button: {
+    // marginBottom: 30,
+    padding: 10,
+    width: 10,
+    alignItems: 'center',
+    backgroundColor: '#2196F3',
+    textAlign: 'center'
+  },
+  buttonText: {
+    // padding: 20,
+    color: 'white',
+  },
   information: {
     // ...StyleSheet.absoluteFillObject,
     flex: 0.5,
