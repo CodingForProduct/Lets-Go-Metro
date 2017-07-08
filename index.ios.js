@@ -14,17 +14,30 @@ import {
 import MapView from 'react-native-maps';
 
 export default class letsGoMetro extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      region: {
+        latitude: 34.0498,
+        longitude: -118.2389,
+        latitudeDelta: 0.5,
+        longitudeDelta: 0.45
+      }
+    };
+  }
+
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(position => {
+      console.log(position);
+    })
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <MapView
           style={styles.map}
-          region={{
-          latitude: 34.0498,
-          longitude: -118.2389,
-          latitudeDelta: 0.5,
-          longitudeDelta: 0.45
-        }}>
+          region={this.state.region}>
         </MapView>
       </View>
     );

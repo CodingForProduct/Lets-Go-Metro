@@ -11,21 +11,21 @@ import {
   Text,
   View
 } from 'react-native';
+import MapView from 'react-native-maps';
 
 export default class letsGoMetro extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu
-        </Text>
+        <MapView
+          style={styles.map}
+          region={{
+          latitude: 34.0498,
+          longitude: -118.2389,
+          latitudeDelta: 0.5,
+          longitudeDelta: 0.45
+        }}>
+        </MapView>
       </View>
     );
   }
@@ -33,10 +33,14 @@ export default class letsGoMetro extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    ...StyleSheet.absoluteFillObject,
+    height: 400,
+    width: 400,
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject
   },
   welcome: {
     fontSize: 20,
