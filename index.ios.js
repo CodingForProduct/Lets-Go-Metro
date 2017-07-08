@@ -9,7 +9,8 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  TextInput
 } from 'react-native';
 import MapView from 'react-native-maps';
 
@@ -45,14 +46,29 @@ export default class letsGoMetro extends Component {
 
   render() {
     return (
-      <View style={{flex: 1, flexDirection: 'column', justifyContent: 'flex-start'}}>
+      <View style={{flex: 1, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'stretch'}}>
         <View style={styles.information}>
+          <View style={styles.informationImage}>
+          </View>
+          <View style={styles.informationText}>
+            <Text>
+              Hi, I'm Metro Driver. I will help you get where you need to go.
+            </Text>
+          </View>
         </View>
         <View style={styles.container}>
           <MapView
             style={styles.map}
             region={this.state.region}>
           </MapView>
+        </View>
+        <View style={styles.directionBar}>
+          <View style={styles.directionImage}>
+          </View>
+          <View style={styles.directionInput}>
+            <TextInput style={styles.inputText} placeholder="Current Location" />
+            <TextInput style={styles.inputText} placeholder="Destination" />
+          </View>
         </View>
       </View>
     );
@@ -64,10 +80,28 @@ const styles = StyleSheet.create({
     // ...StyleSheet.absoluteFillObject,
     flex: 0.5,
     // height: 180,
-    alignItems: 'stretch',
+    flexDirection: 'row',
+    justifyContent: 'center',
     borderRadius: 4,
     borderWidth: 0.5,
     borderColor: 'red',
+  },
+  informationImage: {
+    width: 80,
+    height: 80,
+    marginTop: 30,
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: 'purple',
+  },
+  informationText: {
+    width: 250,
+    height: 80,
+    marginTop: 30,
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: 'orange',
+    padding: 20,
   },
   container: {
     // ...StyleSheet.absoluteFillObject,
@@ -75,7 +109,7 @@ const styles = StyleSheet.create({
     // height: 400,
     // justifyContent: 'flex-end',
     // alignItems: 'center',
-    alignItems: 'stretch',
+    // alignItems: 'stretch',
     borderRadius: 4,
     borderWidth: 0.5,
     borderColor: 'blue',
@@ -83,6 +117,34 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
     borderColor: 'orange'
+  },
+  directionBar: {
+    flex: 0.5,
+    flexDirection: 'row',
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: 'green',
+    justifyContent: 'center',
+  },
+  directionImage: {
+    marginTop: 5,
+    marginRight: 10,
+    height: 100,
+    width: 40,
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: 'orange',
+  },
+  directionInput: {
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+  },
+  inputText: {
+    height: 40,
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: 'black',
+    width: 250
   },
   welcome: {
     fontSize: 20,
