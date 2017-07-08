@@ -70,22 +70,24 @@ export default class MetroMap extends Component {
   }
 
   render(){
-    <View style={styles.container}>
-      <TouchableOpacity onPress={this.zoomIn} style={styles.leftButton}>
-          <View >
-            <Text style={styles.buttonText}>+</Text>
-          </View>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={this.zoomOut} style={styles.rightButton}>
-          <View >
-            <Text style={styles.buttonText}>-</Text>
-          </View>
-      </TouchableOpacity>
-      <MapView
-        style={styles.map}
-        region={this.state.region}>
-      </MapView>
-    </View>
+    return(
+      <View style={styles.container}>
+        <TouchableOpacity onPress={this.zoomIn} style={styles.leftButton}>
+            <View >
+              <Text style={styles.buttonText}>+</Text>
+            </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={this.zoomOut} style={styles.rightButton}>
+            <View >
+              <Text style={styles.buttonText}>-</Text>
+            </View>
+        </TouchableOpacity>
+        <MapView
+          style={styles.map}
+          region={this.state.region}>
+        </MapView>
+      </View>
+    );
   }
 }
 
