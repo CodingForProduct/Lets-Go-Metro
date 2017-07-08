@@ -29,6 +29,7 @@ export default class letsGoMetro extends Component {
         longitudeDelta: LONGITUDE_DELTA
       }
     };
+    this.zoom = this.zoom.bind(this);
   }
 
   // componentDidUpdate
@@ -47,7 +48,20 @@ export default class letsGoMetro extends Component {
   }
 
   zoom(){
-    console.log('press button');
+    console.log('CONSOLE LOG PRESS BUTTON');
+    if (this.state.region.latitudeDelta > 0.01){
+      console.log('INSIDE IF STATEMENT');
+      this.setState({
+        region: {
+          latitude: this.state.region.latitude,
+          longitude: this.state.region.longitude,
+          latitudeDelta: this.state.region.latitudeDelta - 0.005,
+          longitudeDelta: this.state.region.longitudeDelta - 0.005
+        }
+      });
+      console.log(this.state.region.latitudeDelta);
+      console.log(this.state.region.longitudeDelta);
+    }
   }
 
   render() {
@@ -62,14 +76,20 @@ export default class letsGoMetro extends Component {
             </Text>
           </View>
           <View>
-            <TouchableOpacity onPress={this.zoom}>
-              <View style={styles.button}>
-                <Text style={styles.buttonText}>+</Text>
-              </View>
-            </TouchableOpacity>
+
           </View>
         </View>
         <View style={styles.container}>
+          <TouchableOpacity onPress={this.zoom} style={styles.leftButton}>
+              <View >
+                <Text style={styles.buttonText}>+</Text>
+              </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={this.zoom} style={styles.rightButton}>
+              <View >
+                <Text style={styles.buttonText}>-</Text>
+              </View>
+          </TouchableOpacity>
           <MapView
             style={styles.map}
             region={this.state.region}>
@@ -89,17 +109,39 @@ export default class letsGoMetro extends Component {
 }
 
 const styles = StyleSheet.create({
-  button: {
+  leftButton: {
     // marginBottom: 30,
-    padding: 10,
-    width: 10,
+    // padding: 10,
+    width: 20,
+    height: 20,
     alignItems: 'center',
-    backgroundColor: '#2196F3',
-    textAlign: 'center'
+    backgroundColor: '#F5F5F5',
+    position: 'absolute',
+    zIndex: 999,
+    top: 10,
+    right: 40,
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: '#AEACBA'
+  },
+  rightButton: {
+    // marginBottom: 30,
+    // padding: 10,
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    position: 'absolute',
+    zIndex: 999,
+    top: 10,
+    right: 18,
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: '#AEACBA'
   },
   buttonText: {
     // padding: 20,
-    color: 'white',
+    color: 'black',
   },
   information: {
     // ...StyleSheet.absoluteFillObject,
@@ -138,6 +180,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 0.5,
     borderColor: 'blue',
+    position: 'relative'
   },
   map: {
     ...StyleSheet.absoluteFillObject,
