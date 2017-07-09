@@ -10,7 +10,8 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput
+  TextInput,
+    Image
 } from 'react-native';
 import MapView from 'react-native-maps';
 
@@ -30,6 +31,7 @@ export default class letsGoMetro extends Component {
     };
   }
 
+    
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(position => {
       console.log(position);
@@ -49,6 +51,9 @@ export default class letsGoMetro extends Component {
       <View style={{flex: 1, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'stretch'}}>
         <View style={styles.information}>
           <View style={styles.informationImage}>
+            <Image 
+                style={{width: 70, height: 74}}
+                source={require('./img/driver.png')} />
           </View>
           <View style={styles.informationText}>
             <Text>
@@ -60,10 +65,14 @@ export default class letsGoMetro extends Component {
           <MapView
             style={styles.map}
             region={this.state.region}>
+        
           </MapView>
         </View>
         <View style={styles.directionBar}>
           <View style={styles.directionImage}>
+              <Image 
+                style={{width: 22, height: 90, margin: 5}}
+                source={require('./img/direction_image.png')} />
           </View>
           <View style={styles.directionInput}>
             <TextInput style={styles.inputText} placeholder="Current Location" />
@@ -82,26 +91,19 @@ const styles = StyleSheet.create({
     // height: 180,
     flexDirection: 'row',
     justifyContent: 'center',
-    borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: 'red',
+    
   },
   informationImage: {
     width: 80,
     height: 80,
     marginTop: 30,
-    borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: 'purple',
   },
   informationText: {
     width: 250,
     height: 80,
     marginTop: 30,
     borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: 'orange',
-    padding: 20,
+
   },
   container: {
     // ...StyleSheet.absoluteFillObject,
@@ -121,9 +123,7 @@ const styles = StyleSheet.create({
   directionBar: {
     flex: 0.5,
     flexDirection: 'row',
-    borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: 'green',
+
     justifyContent: 'center',
   },
   directionImage: {
@@ -131,9 +131,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     height: 100,
     width: 40,
-    borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: 'orange',
+
   },
   directionInput: {
     flexDirection: 'column',
@@ -144,7 +142,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 0.5,
     borderColor: 'black',
-    width: 250
+    width: 250,    
   },
   welcome: {
     fontSize: 20,
