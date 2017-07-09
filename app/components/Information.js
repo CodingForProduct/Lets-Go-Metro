@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import {
   View,
   Text,
-  StyleSheet
+  StyleSheet,
+  Image
 } from 'react-native';
 
 export default class Information extends Component {
@@ -10,6 +11,7 @@ export default class Information extends Component {
     return (
       <View style={styles.information}>
         <View style={styles.informationImage}>
+          <Image style={styles.driverImage} source={require('../images/driver.png')} />
         </View>
         <View style={styles.informationText}>
           <Text>
@@ -22,31 +24,35 @@ export default class Information extends Component {
 }
 
 const styles = StyleSheet.create({
+  driverImage: {
+    width: 70,
+    height: 74
+  },
   information: {
     // ...StyleSheet.absoluteFillObject,
     flex: 0.5,
     // height: 180,
     flexDirection: 'row',
     justifyContent: 'center',
-    borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: 'red',
+    // borderRadius: 4,
+    // borderWidth: 0.5,
+    // borderColor: 'red',
   },
   informationImage: {
     width: 80,
     height: 80,
     marginTop: 30,
-    borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: 'purple',
+    // borderRadius: 4,
+    // borderWidth: 0.5,
+    // borderColor: 'purple',
   },
   informationText: {
     width: 250,
     height: 80,
     marginTop: 30,
-    borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: 'orange',
     padding: 20,
+    // borderRadius: 4,
+    // borderWidth: 0.5,
+    // borderColor: 'orange',
   },
 });
