@@ -99,10 +99,10 @@ const styles = StyleSheet.create({
     // justifyContent: 'flex-end',
     // alignItems: 'center',
     // alignItems: 'stretch',
-    borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: 'blue',
     position: 'relative'
+    // borderRadius: 4,
+    // borderWidth: 0.5,
+    // borderColor: 'blue',
   },
   map: {
     ...StyleSheet.absoluteFillObject,
