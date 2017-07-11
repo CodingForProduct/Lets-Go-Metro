@@ -7,7 +7,12 @@ import {
 } from 'react-native';
 import MapView from 'react-native-maps';
 
-const LATITUDE_DELTA = 0.5, LONGITUDE_DELTA = 0.45, LATITUDE_DELTA_ZOOM = 0.02, LONGITUDE_DELTA_ZOOM = 0.015
+const LATITUDE_DELTA = 0.5,
+  LONGITUDE_DELTA = 0.45,
+  LATITUDE_DELTA_ZOOM = 0.02,
+  LONGITUDE_DELTA_ZOOM = 0.015,
+  ZOOM_IN_FACTOR = 0.005,
+  ZOOM_OUT_FACTOR = 0.01
 
 export default class MetroMap extends Component {
   constructor(props){
@@ -45,8 +50,8 @@ export default class MetroMap extends Component {
         region: {
           latitude: this.state.region.latitude,
           longitude: this.state.region.longitude,
-          latitudeDelta: this.state.region.latitudeDelta - 0.005,
-          longitudeDelta: this.state.region.longitudeDelta - 0.005
+          latitudeDelta: this.state.region.latitudeDelta - ZOOM_IN_FACTOR,
+          longitudeDelta: this.state.region.longitudeDelta - ZOOM_IN_FACTOR
         }
       });
       console.log(this.state.region.latitudeDelta);
@@ -62,8 +67,8 @@ export default class MetroMap extends Component {
         region: {
           latitude: this.state.region.latitude,
           longitude: this.state.region.longitude,
-          latitudeDelta: this.state.region.latitudeDelta + 0.01,
-          longitudeDelta: this.state.region.longitudeDelta + 0.01
+          latitudeDelta: this.state.region.latitudeDelta + ZOOM_OUT_FACTOR,
+          longitudeDelta: this.state.region.longitudeDelta + ZOOM_OUT_FACTOR
         }
       });
     }

@@ -20,10 +20,14 @@ export default class DirectionsBar extends Component {
     super(props);
     this.state = {
       origin: {
-        text: ""
+        text: "",
+        suggestions: [],
+        selection: ""
       },
       destination: {
-        text: ""
+        text: "",
+        suggestions: [],
+        selection: ""
       },
       showPredictions: false,
       noHeight: new Animated.Value(0),
@@ -33,10 +37,10 @@ export default class DirectionsBar extends Component {
     this.animateBar = this.animateBar.bind(this);
   }
 
-  componentDidMount(){
-    console.log('THIS IS MOUNT');
-    console.log(this.state.someHeight);
-  }
+  // componentDidMount(){
+  //   console.log('THIS IS MOUNT');
+  //   console.log(this.state.someHeight);
+  // }
 
   componentDidUpdate(prevProps, prevState) {
     // if (prevState.origin.text != this.state.origin.text){
