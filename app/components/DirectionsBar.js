@@ -4,7 +4,8 @@ import {
   TextInput,
   StyleSheet,
   Image,
-  Animated
+  Animated,
+  Text
 } from 'react-native';
 
 // use Animated.event
@@ -21,12 +22,14 @@ export default class DirectionsBar extends Component {
     this.state = {
       origin: {
         text: "",
-        suggestions: [],
+        suggestion1: "",
+        suggestion2: "",
         selection: ""
       },
       destination: {
         text: "",
-        suggestions: [],
+        suggestion1: "",
+        suggestion2: "",
         selection: ""
       },
       showPredictions: false,
@@ -43,23 +46,36 @@ export default class DirectionsBar extends Component {
   // }
 
   componentDidUpdate(prevProps, prevState) {
-    // if (prevState.origin.text != this.state.origin.text){
-    //       // console.log(this.state.origin.text);
-    //       var qs = this.state.origin.text.split(' ').join('+');
+    if (prevState.origin.text != this.state.origin.text){
+          console.log('THIS IS THE CURRENT TEXT');
+          console.log(this.state.origin.text);
+          var qs = this.state.origin.text.split(' ').join('+');
 
-    //       console.log('THIS IS THE ENDPT');
-    //       console.log(API_PLACES_ROOT + qs);
-    //       fetch(API_PLACES_ROOT + qs, {
-    //         method: 'GET'
-    //       }).then((response) => {
-    //         console.log('THIS IS THE RESPONSE');
-    //         console.log(response);
-    //         // should only list first two predictions
-    //         // predictions[0].description
-    //       })
-    // }
-    if (this.state.showPredictions === true){
-      console.log('THIS IS TRUE')
+          console.log('THIS IS THE ENDPT');
+          console.log(API_PLACES_ROOT + qs);
+          fetch(API_PLACES_ROOT + qs, {
+            method: 'GET'
+          }).then((response) => {
+            var predictionsArr = JSON.parse(response._bodyInit).predictions;
+            console.log('this is length');
+            console.log(predictionsArr.length);
+
+            if (predictionsArr.length > 1){
+              this.setState({
+                origin: {
+                  suggestion1: predictionsArr[0].description,
+                  suggestion2: predictionsArr[1].description
+                }
+              });
+            }
+
+            // should only list first two predictions
+            // predictions[0].description
+          }).catch((err) => {
+            console.log(err);
+          });
+    }
+    if (prevState.showPredictions != this.state.showPredictions && this.state.showPredictions === true){
       Animated.timing(
         this.state.someHeight,
         {
@@ -79,6 +95,7 @@ export default class DirectionsBar extends Component {
 
   setOriginText(text){
     console.log('INSIDE SET ORIGIN TEXT');
+    console.log(text);
     this.setState({
       origin: {
         text: text
@@ -104,6 +121,7 @@ export default class DirectionsBar extends Component {
   render(){
     // let { someHeight } = this.state.someHeight;
     // let { noHeight } = this.state.noHeight;
+    // console.log('RENDERING AGAIN');
 
     return(
       <Animated.View style={{flexDirection: 'column', flex: this.state.someHeight}}>
@@ -121,8 +139,14 @@ export default class DirectionsBar extends Component {
           justifyContent: 'center',
           flex: this.state.noHeight}}>
           <View style={styles.prediction}>
+            <Text>
+              {this.state.origin.suggestion1}
+            </Text>
           </View>
           <View style={styles.prediction}>
+            <Text>
+              {this.state.origin.suggestion2}
+            </Text>
           </View>
         </Animated.View>
       </Animated.View>
