@@ -14,7 +14,7 @@ const API_KEY = 'AIzaSyCdPnAPE-Kqy_VWKiFtX8Zm4b0T7wyyZ38';
 
 const API_PLACES_ROOT = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?key=' + API_KEY + '&input=';
 
-const API_GEOCODE_ROOT = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+const API_GEOCODE_ROOT = 'https://maps.googleapis.com/maps/api/geocode/json?key=' + API_KEY + '&latlng=';
 
 export default class DirectionsBar extends Component {
   constructor(props){
@@ -24,13 +24,21 @@ export default class DirectionsBar extends Component {
         text: "",
         suggestion1: "",
         suggestion2: "",
-        selection: ""
+        selectionAddress: "",
+        selectionCoord : {
+          latitude: "",
+          longitude: ""
+        }
       },
       destination: {
         text: "",
         suggestion1: "",
         suggestion2: "",
-        selection: ""
+        selectionAddress: "",
+        selectionCoord : {
+          latitude: "",
+          longitude: ""
+        }
       },
       showPredictions: false,
       noHeight: new Animated.Value(0),
@@ -38,18 +46,40 @@ export default class DirectionsBar extends Component {
     }
     this.setOriginText = this.setOriginText.bind(this);
     this.animateBar = this.animateBar.bind(this);
+    this.chooseAddress = this.chooseAddress.bind(this);
   }
 
-  // componentDidMount(){
-  //   console.log('THIS IS MOUNT');
-  //   console.log(this.state.someHeight);
-  // }
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition(position => {
+      let endpt = API_GEOCODE_ROOT + position.coords.latitude + ',' + position.coords.longitude;
+      console.log('THIS IS THE ENDPT');
+      console.log(endpt);
+      fetch(endpt, {
+        method: 'GET'
+      }).then(response => {
+        console.log('THIS IS THE RESPONSE');
+        // console.log(response);
+        console.log(JSON.parse(response._bodyInit).results[0].formatted_address);
+        this.setState({
+          origin: {
+            selectionAddress: JSON.parse(response._bodyInit).results[0].formatted_address,
+            selectionCoord: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            }
+          }
+        });
+      }).catch(err => {
+        console.log(err);
+      })
+    })
+  }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.origin.text != this.state.origin.text){
+    if (prevState.destination.text != this.state.destination.text){
           console.log('THIS IS THE CURRENT TEXT');
-          console.log(this.state.origin.text);
-          var qs = this.state.origin.text.split(' ').join('+');
+          console.log(this.state.destination.text);
+          var qs = this.state.destination.text.split(' ').join('+');
 
           console.log('THIS IS THE ENDPT');
           console.log(API_PLACES_ROOT + qs);
@@ -62,34 +92,48 @@ export default class DirectionsBar extends Component {
 
             if (predictionsArr.length > 1){
               this.setState({
-                origin: {
+                destination: {
                   suggestion1: predictionsArr[0].description,
                   suggestion2: predictionsArr[1].description
                 }
               });
             }
-
-            // should only list first two predictions
-            // predictions[0].description
           }).catch((err) => {
             console.log(err);
           });
     }
-    if (prevState.showPredictions != this.state.showPredictions && this.state.showPredictions === true){
-      Animated.timing(
-        this.state.someHeight,
-        {
-          toValue: 1.5,
-          duration: 800,
-        }
-      ).start();
-      Animated.timing(
-        this.state.noHeight,
-        {
-          toValue: 0.5,
-          duration: 1,
-        }
-      ).start();
+    if (prevState.showPredictions != this.state.showPredictions){
+      if (this.state.showPredictions === true){
+        Animated.timing(
+          this.state.someHeight,
+          {
+            toValue: 1.5,
+            duration: 800,
+          }
+        ).start();
+        Animated.timing(
+          this.state.noHeight,
+          {
+            toValue: 0.5,
+            duration: 1,
+          }
+        ).start();
+      } else {
+        Animated.timing(
+          this.state.someHeight,
+          {
+            toValue: 0.5,
+            duration: 800,
+          }
+        ).start();
+        Animated.timing(
+          this.state.noHeight,
+          {
+            toValue: 0,
+            duration: 1,
+          }
+        ).start();
+      }
     }
   }
 
@@ -97,7 +141,7 @@ export default class DirectionsBar extends Component {
     console.log('INSIDE SET ORIGIN TEXT');
     console.log(text);
     this.setState({
-      origin: {
+      destination: {
         text: text
       }
     });
@@ -108,6 +152,10 @@ export default class DirectionsBar extends Component {
     this.setState({
       showPredictions: true
     })
+  }
+
+  chooseAddress(){
+    console.log('PICKED AN ADDRESS');
   }
 
   // <View style={{flexDirection: 'column', flex: 1.5}}>
@@ -130,24 +178,24 @@ export default class DirectionsBar extends Component {
             <Image style={styles.markerImage} source={require('../images/direction_image.png')} />
           </View>
           <View style={styles.directionInput}>
-            <TextInput style={styles.inputText} placeholder="Current Location" onChangeText={this.setOriginText} onFocus={this.animateBar} />
-            <TextInput style={styles.inputText} placeholder="Destination" />
+            <TextInput style={styles.inputText} placeholder="Current Location" value={this.state.origin.selectionAddress} />
+            <TextInput style={styles.inputText} placeholder="Destination" onFocus={this.animateBar} onChangeText={this.setOriginText} />
           </View>
         </View>
         <Animated.View style={{borderWidth: 0.5,
           borderColor: 'green',
           justifyContent: 'center',
           flex: this.state.noHeight}}>
-          <View style={styles.prediction}>
-            <Text>
-              {this.state.origin.suggestion1}
-            </Text>
-          </View>
-          <View style={styles.prediction}>
-            <Text>
-              {this.state.origin.suggestion2}
-            </Text>
-          </View>
+            <View style={styles.prediction}>
+              <Text>
+                {this.state.destination.suggestion1}
+              </Text>
+            </View>
+            <View style={styles.prediction}>
+              <Text>
+                {this.state.destination.suggestion2}
+              </Text>
+            </View>
         </Animated.View>
       </Animated.View>
     )
