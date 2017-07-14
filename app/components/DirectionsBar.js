@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+const decodePolyline = require('decode-google-map-polyline');
 import {
   View,
   TextInput,
@@ -11,11 +12,10 @@ import {
 
 // use Animated.event
 // if not, use Animated.timing and state to activate it inside componentDidUpdate
-const API_KEY = 'AIzaSyCdPnAPE-Kqy_VWKiFtX8Zm4b0T7wyyZ38';
-
-const API_PLACES_ROOT = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?key=' + API_KEY + '&input=';
-
-const API_GEOCODE_ROOT = 'https://maps.googleapis.com/maps/api/geocode/json?key=' + API_KEY + '&latlng=';
+const API_KEY = 'AIzaSyCdPnAPE-Kqy_VWKiFtX8Zm4b0T7wyyZ38',
+  API_PLACES_ROOT = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?key=' + API_KEY,
+  API_GEOCODE_ROOT = 'https://maps.googleapis.com/maps/api/geocode/json?key=' + API_KEY,
+  API_DIRECTIONS_ROOT = 'https://maps.googleapis.com/maps/api/directions/json?key=' + API_KEY + '&mode=transit&unit=imperial';
 
 
 
@@ -23,31 +23,19 @@ export default class DirectionsBar extends Component {
   constructor(props){
     super(props);
     this.state = {
-      origin: {
-        text: "",
-        suggestion1: "",
-        suggestion2: "",
-        selection: "",
-        selectionAddress: "",
-        selectionCoord : {
-          latitude: "",
-          longitude: ""
-        }
+      originSelectionAddress: "",
+      originSelectionCoord: {
+        latitude: "",
+        longitude: ""
       },
-      destination: {
-        text: "",
-        suggestion1: "",
-        suggestion2: "",
-        selection: "",
-        selectionAddress: "",
-        selectionCoord : {
-          latitude: "",
-          longitude: ""
-        }
-      },
+      destinationText: "",
+      destinationSuggestion1: "",
+      destinationSuggestion2: "",
+      destinationSelection: "",
       showPredictions: false,
       noHeight: new Animated.Value(0),
-      someHeight: new Animated.Value(0.5)
+      someHeight: new Animated.Value(0.5),
+      directions: []
     }
     this.setOriginText = this.setOriginText.bind(this);
     this.animateBar = this.animateBar.bind(this);
@@ -57,22 +45,15 @@ export default class DirectionsBar extends Component {
 
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(position => {
-      let endpt = API_GEOCODE_ROOT + position.coords.latitude + ',' + position.coords.longitude;
-      console.log('THIS IS THE ENDPT');
-      console.log(endpt);
+      let endpt = API_GEOCODE_ROOT + '&latlng=' + position.coords.latitude + ',' + position.coords.longitude;
       fetch(endpt, {
         method: 'GET'
       }).then(response => {
-        console.log('THIS IS THE RESPONSE');
-        // console.log(response);
-        console.log(JSON.parse(response._bodyInit).results[0].formatted_address);
         this.setState({
-          origin: {
-            selectionAddress: JSON.parse(response._bodyInit).results[0].formatted_address,
-            selectionCoord: {
+          originSelectionAddress: JSON.parse(response._bodyInit).results[0].formatted_address,
+          originSelectionCoord: {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude
-            }
           }
         });
       }).catch(err => {
@@ -82,54 +63,67 @@ export default class DirectionsBar extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.destination.selection != this.state.destination.selection){
-      console.log('THIS IS ORIGIN AND DESTINATION');
-      console.log(this.state.origin);
-      console.log(this.state.destination);
+    if (prevState.destinationSelection != this.state.destinationSelection && (this.state.destinationSelection && this.state.originSelectionAddress)){
 
-      if (this.state.origin.selectionAddress && this.state.destination.selection){
-
-
-        if (this.state.destination.selection == 'suggestion1'){
-          console.log('THIS IS THE FIRST SUGGESTION');
-          console.log(this.state.destination.suggestion1);
-        // TODO: make call to directions api w/ this.state.origin.selectionAddress & this.state.destination.suggestion1
-
-        } else if (this.state.destination.selection == 'suggestion2'){
-          console.log('THIS IS THE SECOND SUGGESTION');
-          console.log(this.state.destination.suggestion2);
-        }
-      } // closes checking for valid values
-    } // closes prevState & thisState
-    if (prevState.destination.text != this.state.destination.text){
-      console.log('THIS IS THE CURRENT TEXT');
-      console.log(this.state.destination.text);
-      if (this.state.destination.text && !this.state.destination.selection){
-        console.log('MAKING A FETCH');
-        var qs = this.state.destination.text.split(' ').join('+');
-
+      if (this.state.destinationSelection == 'suggestion1'){
+        var qsDestination = this.state.destinationSuggestion1.split(' ').join('+');
+        var qsOrigin = this.state.originSelectionAddress.split(' ').join('+')
+        let endpt = API_DIRECTIONS_ROOT + '&origin=' + qsOrigin + '&destination=' + qsDestination;
         console.log('THIS IS THE ENDPT');
-        console.log(API_PLACES_ROOT + qs);
-        fetch(API_PLACES_ROOT + qs, {
-          method: 'GET'
-        }).then((response) => {
-          var predictionsArr = JSON.parse(response._bodyInit).predictions;
-          console.log('this is length');
-          console.log(predictionsArr.length);
+        console.log(endpt);
 
-          if (predictionsArr.length > 1){
-            this.setState({
-              destination: {
-                suggestion1: predictionsArr[0].description,
-                suggestion2: predictionsArr[1].description
-              }
-            });
-          }
-        }).catch((err) => {
-          console.log(err);
+        fetch(endpt, {
+          method: 'GET'
+        }).then(response => {
+          console.log('THESE ARE DIRECTIONS WE ARE GETTING BACK FROM SERVER');
+          // console.log(response);
+          let responseData = JSON.parse(response._bodyInit);
+
+          let legs = responseData.routes[0].legs[0].steps;
+          let polylineEncoded = responseData.routes[0].overview_polyline;
+          let polylineDecoded = decodePolyline(''+polylineEncoded);
+
+          console.log('THIS IS THE POLYLINE DECODED');
+          console.log(decodePolyline(''+polylineEncoded));
+
+          // steps.forEach(el => {
+          //   if (!el.transit_details || el.travel_mode != 'TRANSIT'){
+          //     // it\'s walking
+          //   }
+
+          //   // TRANSIT steps have the property transit_details, the travel_mode = 'TRANSIT', there is no steps prop
+
+          //   // walking STEPs have WALKING and have steps arr
+          // });
+
         });
+
+      } else if (this.state.destinationSelection == 'suggestion2'){
+
       }
+    } // closes prevState & thisState
+
+    if (prevState.destinationText != this.state.destinationText){
+      // console.log('THIS IS THE CURRENT TEXT');
+      // console.log(this.state.destinationText);
+      // console.log('MAKING A FETCH');
+      var qs = this.state.destinationText.split(' ').join('+');
+
+      fetch(API_PLACES_ROOT + '&input=' + qs, {
+        method: 'GET'
+      }).then((response) => {
+        var predictionsArr = JSON.parse(response._bodyInit).predictions;
+        if (predictionsArr.length > 1){
+          this.setState({
+            destinationSuggestion1: predictionsArr[0].description,
+            destinationSuggestion2: predictionsArr[1].description
+          });
+        }
+      }).catch((err) => {
+        console.log(err);
+      });
     }
+
     if (prevState.showPredictions != this.state.showPredictions){
       if (this.state.showPredictions === true){
         Animated.timing(
@@ -169,9 +163,7 @@ export default class DirectionsBar extends Component {
     console.log('INSIDE SET ORIGIN TEXT');
     console.log(text);
     this.setState({
-      destination: {
-        text: text
-      }
+      destinationText: text
     });
   }
 
@@ -185,23 +177,15 @@ export default class DirectionsBar extends Component {
   chooseAddress1(){
     console.log('CHOSE ADDRESS');
     this.setState({
-      destination: {
-        suggestion1: this.state.destination.suggestion1,
-        suggestion2: this.state.destination.suggestion2,
-        selection: "suggestion1"
-      }
-    })
+      destinationSelection: "suggestion1"
+    });
   }
 
   chooseAddress2(){
     console.log('CHOSE ADDRESS');
     this.setState({
-      destination: {
-        suggestion1: this.state.destination.suggestion1,
-        suggestion1: this.state.destination.suggestion1,
-        selection: "suggestion2"
-      }
-    })
+      destinationSelection: "suggestion2"
+    });
   }
 
   // <View style={{flexDirection: 'column', flex: 1.5}}>
@@ -224,7 +208,7 @@ export default class DirectionsBar extends Component {
             <Image style={styles.markerImage} source={require('../images/direction_image.png')} />
           </View>
           <View style={styles.directionInput}>
-            <TextInput style={styles.inputText} placeholder="Current Location" value={this.state.origin.selectionAddress} />
+            <TextInput style={styles.inputText} placeholder="Current Location" value={this.state.originSelectionAddress} />
             <TextInput style={styles.inputText} placeholder="Destination" onFocus={this.animateBar} onChangeText={this.setOriginText} />
           </View>
         </View>
@@ -235,14 +219,14 @@ export default class DirectionsBar extends Component {
             <TouchableOpacity onPress={this.chooseAddress1} style={styles.prediction}>
               <View>
                 <Text>
-                  {this.state.destination.suggestion1}
+                  {this.state.destinationSuggestion1}
                 </Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={this.chooseAddress2} style={styles.prediction}>
               <View>
                 <Text>
-                  {this.state.destination.suggestion2}
+                  {this.state.destinationSuggestion2}
                 </Text>
               </View>
             </TouchableOpacity>
