@@ -80,11 +80,28 @@ export default class DirectionsBar extends Component {
           let responseData = JSON.parse(response._bodyInit);
 
           let legs = responseData.routes[0].legs[0].steps;
-          let polylineEncoded = responseData.routes[0].overview_polyline;
-          let polylineDecoded = decodePolyline(''+polylineEncoded);
+          let stepsArr = [];
+          let directionsArr = [];
 
-          console.log('THIS IS THE POLYLINE DECODED');
-          console.log(decodePolyline(''+polylineEncoded));
+          legs.forEach(el => {
+            stepsArr.push({
+              latitude: el.start_location.lat,
+              longitude: el.start_location.lng
+            });
+            stepsArr.push({
+              latitude: el.end_location.lat,
+              longitude: el.end_location.lng
+            })
+          });
+
+          // console.log('THIS IS STEPS ARR');
+          // console.log(stepsArr);
+          this.props.updatePolylineCoord(stepsArr);
+          // let polylineEncoded = responseData.routes[0].overview_polyline;
+          // let polylineDecoded = decodePolyline(''+polylineEncoded);
+
+          // console.log('THIS IS THE POLYLINE DECODED');
+          // console.log(decodePolyline(''+polylineEncoded));
 
           // steps.forEach(el => {
           //   if (!el.transit_details || el.travel_mode != 'TRANSIT'){

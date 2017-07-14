@@ -23,7 +23,8 @@ export default class MetroMap extends Component {
         longitude: -118.2389,
         latitudeDelta: LATITUDE_DELTA,
         longitudeDelta: LONGITUDE_DELTA
-      }
+      },
+      polylineCoord: [{latitude: 0, longitude: 0}, {latitude: 0, longitude: 0}]
     };
     this.zoomIn = this.zoomIn.bind(this);
     this.zoomOut = this.zoomOut.bind(this);
@@ -78,8 +79,11 @@ export default class MetroMap extends Component {
 // [ { lat: 0.00014, lng: 8913.93592 },
 //    { lat: 0.00022, lng: 3769.98278 } ]
 
+        // latitude: 34.0498,
+        // longitude: -118.2389,
+
   render(){
-    let coord = [{ latitude: 0.00014, longitude: 8913.93592 }, { latitude: 0.00022, longitude: 3769.98278}]
+    let coord = [{ latitude: 34.0498, longitude: -118.2389 }, { latitude: 35.0498, longitude: -119.2389}]
     return(
       <View style={styles.container}>
         <TouchableOpacity onPress={this.zoomIn} style={styles.leftButton}>
@@ -95,7 +99,7 @@ export default class MetroMap extends Component {
         <MapView
           style={styles.map}
           region={this.state.region}>
-          <MapView.Polyline coordinates={coord}/>
+          <MapView.Polyline coordinates={this.props.polylineCoord}/>
         </MapView>
       </View>
     );
