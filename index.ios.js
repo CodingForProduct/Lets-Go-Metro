@@ -10,12 +10,33 @@ import DirectionsBar from './app/components/DirectionsBar';
 
 
 export default class letsGoMetro extends Component {
+
+  constructor(){
+    super();
+    this.state = {
+      polylineCoord: [{latitude: 0, longitude: 0}, {latitude: 0, longitude: 0}],
+      layoutState: 0
+    };
+    this.updatePolylineCoord = this.updatePolylineCoord.bind(this);
+  }
+
+  updatePolylineCoord(arr){
+    this.setState({
+      polylineCoord: arr
+    });
+  }
+
+  componentDidUpdate(){
+    console.log('I AM IN PARENT COMPONENT');
+    console.log(this.state);
+  }
+
   render() {
     return (
-      <View style={{flex: 1, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'stretch'}}>
+      <View style={{flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center'}}>
         <Information />
-        <MetroMap />
-        <DirectionsBar />
+        <MetroMap polylineCoord={this.state.polylineCoord} />
+        <DirectionsBar updatePolylineCoord={this.updatePolylineCoord}/>
       </View>
     );
   }

@@ -30,13 +30,22 @@ const styles = StyleSheet.create({
   },
   information: {
     // ...StyleSheet.absoluteFillObject,
-    flex: 0.5,
+    // flex: 0.5,
     // height: 180,
     flexDirection: 'row',
-    justifyContent: 'center',
-    // borderRadius: 4,
-    // borderWidth: 0.5,
-    // borderColor: 'red',
+    // justifyContent: 'center',
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: 'red',
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    height: 130,
+    width: '100%',
+    backgroundColor: '#fff',
+    zIndex: 100,
+    //top padding to account for the iphone status bar
+    paddingTop: 15
   },
   informationImage: {
     width: 80,

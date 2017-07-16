@@ -23,7 +23,8 @@ export default class MetroMap extends Component {
         longitude: -118.2389,
         latitudeDelta: LATITUDE_DELTA,
         longitudeDelta: LONGITUDE_DELTA
-      }
+      },
+      polylineCoord: [{latitude: 0, longitude: 0}, {latitude: 0, longitude: 0}]
     };
     this.zoomIn = this.zoomIn.bind(this);
     this.zoomOut = this.zoomOut.bind(this);
@@ -74,6 +75,13 @@ export default class MetroMap extends Component {
     }
   }
 
+//TEST
+// [ { lat: 0.00014, lng: 8913.93592 },
+//    { lat: 0.00022, lng: 3769.98278 } ]
+
+        // latitude: 34.0498,
+        // longitude: -118.2389,
+
   render(){
     return(
       <View style={styles.container}>
@@ -90,6 +98,7 @@ export default class MetroMap extends Component {
         <MapView
           style={styles.map}
           region={this.state.region}>
+          <MapView.Polyline coordinates={this.props.polylineCoord}/>
         </MapView>
       </View>
     );
@@ -99,15 +108,21 @@ export default class MetroMap extends Component {
 const styles = StyleSheet.create({
   container: {
     // ...StyleSheet.absoluteFillObject,
-    flex: 2,
+    // flex: 2,
     // height: 400,
     // justifyContent: 'flex-end',
     // alignItems: 'center',
     // alignItems: 'stretch',
-    position: 'relative'
+    // position: 'relative'
     // borderRadius: 4,
     // borderWidth: 0.5,
     // borderColor: 'blue',
+    position: 'relative',
+    height: '100%',
+    width: '100%',
+    paddingTop: 100,
+    paddingBottom: 100,
+    backgroundColor: 'green'
   },
   map: {
     ...StyleSheet.absoluteFillObject,
@@ -122,7 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     position: 'absolute',
     zIndex: 999,
-    top: 10,
+    top: 140,
     right: 40,
     borderRadius: 4,
     borderWidth: 0.5,
@@ -137,7 +152,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     position: 'absolute',
     zIndex: 999,
-    top: 10,
+    top: 140,
     right: 18,
     borderRadius: 4,
     borderWidth: 0.5,
