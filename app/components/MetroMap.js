@@ -98,6 +98,7 @@ export default class MetroMap extends Component {
         <MapView
           style={styles.map}
           region={this.state.region}>
+          <MapView.Marker coordinate={{latitude: this.state.region.latitude, longitude: this.state.region.longitude}} />
           <MapView.Polyline coordinates={this.props.polylineCoord}/>
         </MapView>
       </View>
