@@ -11,7 +11,7 @@ import DirectionsBar from './app/components/DirectionsBar';
 export default class letsGoMetro extends Component {
   render() {
     return (
-      <View style={{flex: 1, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'stretch'}}>
+      <View style={{flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center'}}>
         <Information />
         <MetroMap />
         <DirectionsBar />

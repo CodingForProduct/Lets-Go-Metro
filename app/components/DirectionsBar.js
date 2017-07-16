@@ -34,7 +34,8 @@ export default class DirectionsBar extends Component {
       destinationSelection: "",
       showPredictions: false,
       noHeight: new Animated.Value(0),
-      someHeight: new Animated.Value(0.5),
+      noHeightBtn: new Animated.Value(0),
+      someHeight: new Animated.Value(100),
       directions: []
     }
     this.setOriginText = this.setOriginText.bind(this);
@@ -63,6 +64,8 @@ export default class DirectionsBar extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+
+    // making the call for directions
     if (prevState.destinationSelection != this.state.destinationSelection && (this.state.destinationSelection && this.state.originSelectionAddress)){
 
       if (this.state.destinationSelection == 'suggestion1'){
@@ -82,36 +85,42 @@ export default class DirectionsBar extends Component {
           let legs = responseData.routes[0].legs[0].steps;
           let stepsArr = [];
           let directionsArr = [];
+          let transitDetails = [];
 
           legs.forEach(el => {
-            stepsArr.push({
-              latitude: el.start_location.lat,
-              longitude: el.start_location.lng
-            });
-            stepsArr.push({
-              latitude: el.end_location.lat,
-              longitude: el.end_location.lng
-            })
+            if (el.travel_mode === 'TRANSIT'){
+              stepsArr.push({
+                latitude: el.start_location.lat,
+                longitude: el.start_location.lng
+              });
+              stepsArr.push({
+                latitude: el.end_location.lat,
+                longitude: el.end_location.lng
+              })
+              directionsArr.push(el.html_instructions);
+              transitDetails.push(el.transit_details);
+            } else if (el.travel_mode === 'WALKING'){
+              directionsArr.push(el.html_instructions);
+              el.steps.forEach(step => {
+                stepsArr.push({
+                  latitude: step.start_location.lat,
+                  longitude: step.start_location.lng
+                });
+                stepsArr.push({
+                  latitude: step.end_location.lat,
+                  longitude: step.end_location.lng
+                });
+                if (step.html_instructions){
+                  directionsArr.push(step.html_instructions);
+                }
+              });
+            }
           });
 
-          // console.log('THIS IS STEPS ARR');
-          // console.log(stepsArr);
+          console.log(transitDetails);
+
+          console.log(directionsArr);
           this.props.updatePolylineCoord(stepsArr);
-          // let polylineEncoded = responseData.routes[0].overview_polyline;
-          // let polylineDecoded = decodePolyline(''+polylineEncoded);
-
-          // console.log('THIS IS THE POLYLINE DECODED');
-          // console.log(decodePolyline(''+polylineEncoded));
-
-          // steps.forEach(el => {
-          //   if (!el.transit_details || el.travel_mode != 'TRANSIT'){
-          //     // it\'s walking
-          //   }
-
-          //   // TRANSIT steps have the property transit_details, the travel_mode = 'TRANSIT', there is no steps prop
-
-          //   // walking STEPs have WALKING and have steps arr
-          // });
 
         });
 
@@ -120,6 +129,8 @@ export default class DirectionsBar extends Component {
       }
     } // closes prevState & thisState
 
+
+    // make call for suggestions
     if (prevState.destinationText != this.state.destinationText){
       // console.log('THIS IS THE CURRENT TEXT');
       // console.log(this.state.destinationText);
@@ -141,35 +152,44 @@ export default class DirectionsBar extends Component {
       });
     }
 
+    // expand bar
     if (prevState.showPredictions != this.state.showPredictions){
       if (this.state.showPredictions === true){
+        this.setState({
+          noHeightBtn: 40
+        });
         Animated.timing(
           this.state.someHeight,
           {
-            toValue: 1.5,
-            duration: 800,
+            toValue: 200,
+            duration: 500,
           }
         ).start();
         Animated.timing(
           this.state.noHeight,
           {
-            toValue: 0.5,
-            duration: 1,
+            toValue: 100,
+            duration: 500,
           }
         ).start();
-      } else {
+
+      }
+      else {
+        this.setState({
+          noHeightBtn: 0
+        });
         Animated.timing(
           this.state.someHeight,
           {
-            toValue: 0.5,
-            duration: 800,
+            toValue: 100,
+            duration: 500,
           }
         ).start();
         Animated.timing(
           this.state.noHeight,
           {
-            toValue: 0,
-            duration: 1,
+            toValue: 1,
+            duration: 500,
           }
         ).start();
       }
@@ -194,24 +214,18 @@ export default class DirectionsBar extends Component {
   chooseAddress1(){
     console.log('CHOSE ADDRESS');
     this.setState({
-      destinationSelection: "suggestion1"
+      destinationSelection: "suggestion1",
+      showPredictions: false
     });
   }
 
   chooseAddress2(){
     console.log('CHOSE ADDRESS');
     this.setState({
-      destinationSelection: "suggestion2"
+      destinationSelection: "suggestion2",
+      showPredictions: false
     });
   }
-
-  // <View style={{flexDirection: 'column', flex: 1.5}}>
-
-  // <View style={{borderWidth: 0.5,
-  //   borderColor: 'green',
-  //   justifyContent: 'center',
-  //   flex: 0.5}}>
-  // </View>
 
   render(){
     // let { someHeight } = this.state.someHeight;
@@ -219,7 +233,19 @@ export default class DirectionsBar extends Component {
     // console.log('RENDERING AGAIN');
 
     return(
-      <Animated.View style={{flexDirection: 'column', flex: this.state.someHeight}}>
+      <Animated.View style={{
+        flexDirection: 'column',
+        position: 'absolute',
+        left: 0,
+        bottom: 0,
+        width: '100%',
+        backgroundColor: '#fff',
+        zIndex: 100,
+        paddingBottom: 15,
+        borderRadius: 4,
+        borderWidth: 0.5,
+        borderColor: 'red',
+        height: this.state.someHeight}}>
         <View style={styles.directionBar}>
           <View style={styles.directionImage}>
             <Image style={styles.markerImage} source={require('../images/direction_image.png')} />
@@ -229,18 +255,28 @@ export default class DirectionsBar extends Component {
             <TextInput style={styles.inputText} placeholder="Destination" onFocus={this.animateBar} onChangeText={this.setOriginText} />
           </View>
         </View>
-        <Animated.View style={{borderWidth: 0.5,
-          borderColor: 'green',
+        <Animated.View style={{
+          borderRadius: 4,
+          borderWidth: 0.5,
+          borderColor: 'blue',
           justifyContent: 'center',
-          flex: this.state.noHeight}}>
-            <TouchableOpacity onPress={this.chooseAddress1} style={styles.prediction}>
+          height: this.state.noHeight}}>
+            <TouchableOpacity onPress={this.chooseAddress1} style={{    borderWidth: 0.5,
+                  borderColor: 'purple',
+                  justifyContent: 'center',
+                  height: this.state.noHeightBtn
+              }}>
               <View>
                 <Text>
                   {this.state.destinationSuggestion1}
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={this.chooseAddress2} style={styles.prediction}>
+            <TouchableOpacity onPress={this.chooseAddress2} style={{    borderWidth: 0.5,
+                  borderColor: 'purple',
+                  justifyContent: 'center',
+                  height: this.state.noHeightBtn
+              }}>
               <View>
                 <Text>
                   {this.state.destinationSuggestion2}
@@ -254,14 +290,14 @@ export default class DirectionsBar extends Component {
 }
 
 const styles = StyleSheet.create({
-  predictionsBar: {
-    borderWidth: 0.5,
-    borderColor: 'green',
-    justifyContent: 'center',
-    flex: 0.5,
-  },
+  // predictionsBar: {
+  //   borderWidth: 0.5,
+  //   borderColor: 'green',
+  //   justifyContent: 'center',
+  //   flex: 0.5,
+  // },
   prediction: {
-    flex: 0.5,
+    height: 0,
     borderWidth: 0.5,
     borderColor: 'black',
     justifyContent: 'center',
@@ -273,12 +309,12 @@ const styles = StyleSheet.create({
   },
   directionBar: {
     // flex: 0.5,
-    flex: 0.5,
+    height: 100,
     flexDirection: 'row',
     borderRadius: 4,
-    // borderWidth: 0.5,
-    // borderColor: 'green',
-    // justifyContent: 'center',
+    borderWidth: 0.5,
+    borderColor: 'green',
+    justifyContent: 'center',
   },
   directionImage: {
     marginTop: 5,
