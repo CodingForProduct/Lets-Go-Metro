@@ -33,9 +33,13 @@ export default class DirectionsBar extends Component {
       destinationSuggestion2: "",
       destinationSelection: "",
       showPredictions: false,
+      showInput: true,
+      showDirections: false,
       noHeight: new Animated.Value(0),
       noHeightBtn: new Animated.Value(0),
-      someHeight: new Animated.Value(100),
+      componentHeight: new Animated.Value(100),
+      directionsHeight: 0,
+      inputHeight: 100,
       directions: []
     }
     this.setOriginText = this.setOriginText.bind(this);
@@ -159,7 +163,7 @@ export default class DirectionsBar extends Component {
           noHeightBtn: 40
         });
         Animated.timing(
-          this.state.someHeight,
+          this.state.componentHeight,
           {
             toValue: 200,
             duration: 500,
@@ -179,7 +183,7 @@ export default class DirectionsBar extends Component {
           noHeightBtn: 0
         });
         Animated.timing(
-          this.state.someHeight,
+          this.state.componentHeight,
           {
             toValue: 100,
             duration: 500,
@@ -193,6 +197,16 @@ export default class DirectionsBar extends Component {
           }
         ).start();
       }
+    }
+
+    if (prevState.showDirections != this.state.showDirections){
+        if (this.state.showDirections === true){
+          this.setState({
+            inputHeight: 0,
+            directionsHeight: 100,
+            noHeightBtn: 0
+          });
+        }
     }
   }
 
@@ -215,7 +229,10 @@ export default class DirectionsBar extends Component {
     console.log('CHOSE ADDRESS');
     this.setState({
       destinationSelection: "suggestion1",
-      showPredictions: false
+      showPredictions: false,
+      showDirections: true
+      // showDirections
+      // showInput
     });
   }
 
@@ -223,15 +240,12 @@ export default class DirectionsBar extends Component {
     console.log('CHOSE ADDRESS');
     this.setState({
       destinationSelection: "suggestion2",
-      showPredictions: false
+      showPredictions: false,
+      showDirections: true
     });
   }
 
   render(){
-    // let { someHeight } = this.state.someHeight;
-    // let { noHeight } = this.state.noHeight;
-    // console.log('RENDERING AGAIN');
-
     return(
       <Animated.View style={{
         flexDirection: 'column',
@@ -241,12 +255,28 @@ export default class DirectionsBar extends Component {
         width: '100%',
         backgroundColor: '#fff',
         zIndex: 100,
-        paddingBottom: 15,
+        // paddingBottom: 15,
         borderRadius: 4,
         borderWidth: 0.5,
         borderColor: 'red',
-        height: this.state.someHeight}}>
-        <View style={styles.directionBar}>
+        height: this.state.componentHeight}}>
+        <View style={{
+          height: this.state.directionsHeight,
+          flexDirection: 'row',
+          borderRadius: 4,
+          borderWidth: 0.5,
+          borderColor: 'green',
+          justifyContent: 'center',
+        }}>
+        </View>
+        <View style={{
+          height: this.state.inputHeight,
+          flexDirection: 'row',
+          borderRadius: 4,
+          borderWidth: 0.5,
+          borderColor: 'green',
+          justifyContent: 'center',
+        }}>
           <View style={styles.directionImage}>
             <Image style={styles.markerImage} source={require('../images/direction_image.png')} />
           </View>
