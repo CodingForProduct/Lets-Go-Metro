@@ -68,8 +68,8 @@ export default class DirectionsBar extends Component {
         // console.log(typeof response._bodyInit);
 
         this.setState({
-          // originText: JSON.parse(response._bodyInit).results[0].formatted_address,
-          // originSelection: JSON.parse(response._bodyInit).results[0].formatted_address,
+          originText: JSON.parse(response._bodyInit).results[0].formatted_address,
+          originSelection: JSON.parse(response._bodyInit).results[0].formatted_address,
           currentPosition: {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
@@ -83,20 +83,26 @@ export default class DirectionsBar extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     // need to fix below later
-    if ((prevState.destinationSelection != this.state.destinationSelection || prevState.originSelection != this.state.originSelection) && (this.state.originSelection && this.state.destinationSelection)){
+    if ((prevState.destinationSelection != this.state.destinationSelection || prevState.originSelection != this.state.originSelection) && (this.state.originText && this.state.destinationSelection)){
       console.log('INSIDE GET ADDRESS IF');
-      var destinationStr = this.state.destinationSelection == 'suggestion1' ? destinationSuggestion1 : destinationSuggestion2;
-      var originStr = this.state.originSelection == 'suggestion1' ? originSuggestion1 : this.state.originSelection == 'suggestion2' ? originSuggestion2 : originText
+      var destinationStr = this.state.destinationSelection == 'suggestion1' ? this.state.destinationSuggestion1 : this.state.destinationSuggestion2;
+      var originStr = this.state.originSelection == 'suggestion1' ? this.state.originSuggestion1 : this.state.originSelection == 'suggestion2' ? this.state.originSuggestion2 : this.state.originText
 
-      console.log('THIS IS DEST' + destinationStr);
-      console.log('THIS IS ORIGIN' + originStr);
+      helper.getDirections(destinationStr, originStr)
+      .then(objArrs => {
+        this.setState({
+          directionsArr: objArrs.directionsArr,
+          showDirections: true,
+          showPredictions: false,
+          showInput: false
+        });
+        this.props.updatePolylineCoord(objArrs.stepsArr);
+      });
     }
 
     // make call for suggestions -- change data
     if (prevState.destinationText != this.state.destinationText){
-      console.log(this.state.destinationText);
       helper.getPredictions(this.state.destinationText).then(predictionsArr => {
-        console.log(predictionsArr);
         if (predictionsArr.length > 1){
           this.setState({
             destinationSuggestion1: predictionsArr[0].description,
@@ -160,7 +166,7 @@ export default class DirectionsBar extends Component {
         Animated.timing(
           this.state.noHeight,
           {
-            toValue: 1,
+            toValue: 0,
             duration: 500,
           }
         ).start();
@@ -229,39 +235,55 @@ export default class DirectionsBar extends Component {
   }
 
   setA(){
+    console.log('SET A');
     this.setState({
       inputFocus: 'origin'
     });
   }
 
   setB(){
+    console.log('SET B');
     this.setState({
       inputFocus: 'destination'
     });
   }
 
   chooseAddress1(){
-    console.log('CHOSE ADDRESS');
+    console.log('CHOSE ADDRESS YAAAY');
     if (this.state.inputFocus == 'origin'){
+      console.log('INSIDE ORIGIN CHOOSE ADDRESS 1');
       this.setState({
-        originSelection: "suggestion1"
+        originSelection: "suggestion1",
+        originText: this.state.originSuggestion1,
+        showPredictions: false,
+        showInput: true
       });
+      console.log(this.state.originText);
     } else if (this.state.inputFocus == 'destination'){
       this.setState({
-        destinationSelection: "suggestion1"
+        destinationSelection: "suggestion1",
+        destinationText: this.state.destinationSuggestion1,
+        showPredictions: false,
+        showInput: true
       });
     }
   }
 
   chooseAddress2(){
-    console.log('CHOSE ADDRESS');
+    console.log('CHOSE ADDRESS MEE');
     if (this.state.inputFocus == 'origin'){
       this.setState({
-        originSelection: "suggestion2"
+        originSelection: "suggestion2",
+        originText: this.state.originSuggestion2,
+        showPredictions: false,
+        showInput: true
       });
     } else if (this.state.inputFocus == 'destination'){
       this.setState({
-        destinationSelection: "suggestion2"
+        destinationSelection: "suggestion2",
+        destinationText: this.state.destinationSuggestion2,
+        showPredictions: false,
+        showInput: true
       });
     }
   }
@@ -321,7 +343,7 @@ export default class DirectionsBar extends Component {
               paddingLeft: 10
             }} placeholder="Current Location"
             value={this.state.originText}
-            onFocus={this.state.setA}
+            onFocus={this.setA}
             onChangeText={this.setOriginText}
             />
             <TextInput style={{
@@ -332,7 +354,8 @@ export default class DirectionsBar extends Component {
               width: 250,
               paddingLeft: 10
             }} placeholder="Destination"
-            onFocus={this.state.setB}
+            value={this.state.destinationText}
+            onFocus={this.setB}
             onChangeText={this.setDestinationText}
             />
           </View>
@@ -420,92 +443,3 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
 });
-
-    // making the call for directions
-
-    // if (prevState.destinationSelection != this.state.destinationSelection && (this.state.destinationSelection && this.state.originText)){
-
-    //   if (this.state.destinationSelection == 'suggestion1'){
-    //     var qsDestination = this.state.destinationSuggestion1.split(' ').join('+');
-    //     var qsOrigin = this.state.originText.split(' ').join('+');
-    //     let endpt = API_DIRECTIONS_ROOT + '&origin=' + qsOrigin + '&destination=' + qsDestination;
-    //     console.log('THIS IS THE ENDPT');
-    //     console.log(endpt);
-
-    //     fetch(endpt, {
-    //       method: 'GET'
-    //     }).then(response => {
-    //       console.log('THESE ARE DIRECTIONS WE ARE GETTING BACK FROM SERVER');
-    //       // console.log(response);
-    //       let responseData = JSON.parse(response._bodyInit);
-    //       console.log(responseData);
-
-    //       let legs = responseData.routes[0].legs[0].steps;
-    //       let stepsArr = [];
-    //       let directionsArr = [];
-    //       let transitDetails = [];
-
-    //       legs.forEach(el => {
-    //         if (el.travel_mode === 'TRANSIT'){
-    //           stepsArr.push({
-    //             latitude: el.start_location.lat,
-    //             longitude: el.start_location.lng
-    //           });
-    //           stepsArr.push({
-    //             latitude: el.end_location.lat,
-    //             longitude: el.end_location.lng
-    //           })
-    //           // directionsArr.push(el.html_instructions);
-
-    //           var directionObj = {};
-    //           directionObj["key"] = el.html_instructions;
-    //           console.log('THIS IS DIRECTION OBJ INSIDE TRANSIT');
-    //           console.log(directionObj);
-    //           directionsArr.push(
-    //             directionObj
-    //           );
-    //           transitDetails.push(el.transit_details);
-    //         } else if (el.travel_mode === 'WALKING'){
-    //           // the overview instructions
-    //           // let directionObj = {};
-    //           // directionObj["key"] = el.html_instructions;
-    //           // directionsArr.push(el.html_instructions);
-    //           el.steps.forEach(step => {
-    //             stepsArr.push({
-    //               latitude: step.start_location.lat,
-    //               longitude: step.start_location.lng
-    //             });
-    //             stepsArr.push({
-    //               latitude: step.end_location.lat,
-    //               longitude: step.end_location.lng
-    //             });
-    //             if (step.html_instructions){
-    //               // directionsArr.push(step.html_instructions);
-
-    //               var directionObj = {};
-    //               directionObj["key"] = step.html_instructions;
-    //               directionsArr.push(
-    //                 directionObj
-    //               );
-    //             }
-    //           });
-    //         }
-    //           this.setState({
-    //             directionsArr: directionsArr
-    //           });
-    //       });
-
-    //       console.log(transitDetails);
-    //       console.log('THIS IS DIRECTIONS ARR');
-    //       console.log(directionsArr);
-    //       this.setState({
-    //         directionsArr: directionsArr
-    //       });
-    //       this.props.updatePolylineCoord(stepsArr);
-
-    //     });
-
-    //   } else if (this.state.destinationSelection == 'suggestion2'){
-
-    //   }
-    // } // closes prevState & thisState

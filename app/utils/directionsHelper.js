@@ -3,14 +3,14 @@ const API_KEY = 'AIzaSyCdPnAPE-Kqy_VWKiFtX8Zm4b0T7wyyZ38',
   API_GEOCODE_ROOT = 'https://maps.googleapis.com/maps/api/geocode/json?key=' + API_KEY,
   API_DIRECTIONS_ROOT = 'https://maps.googleapis.com/maps/api/directions/json?key=' + API_KEY + '&mode=transit&unit=imperial';
 
-
-
 var helpers = {
-  getDirections: function(selectText){
-    var qsDestination = selectText.split(' ').join('+');
-    var qsOrigin = selectText.split(' ').join('+');
+  getDirections: function(destinationStr, originStr){
+    var qsDestination = destinationStr.replace(/,/g, '').split(' ').join('+');
+    var qsOrigin = originStr.replace(/,/g, '').split(' ').join('+');
     let endpt = API_DIRECTIONS_ROOT + '&origin=' + qsOrigin + '&destination=' + qsDestination;
-    fetch(endpt, {
+    console.log('THIS IS THE ENDPT: ' + endpt);
+
+    return fetch(endpt, {
       method: 'GET'
     }).then(response => {
       let responseData = JSON.parse(response._bodyInit);
@@ -56,11 +56,15 @@ var helpers = {
             }
           });
         } // closes else if
-        return directionsArr;
-        // this.setState({
-        //   directionsArr: directionsArr
-        // }); // closes setState
       }); // closes legs forEach
+        var returnObj = {
+          directionsArr: directionsArr,
+          stepsArr: stepsArr,
+          transitDetails: transitDetails
+        };
+        console.log('this is returnObj in helper');
+        console.log(returnObj);
+        return returnObj;
     }); // closes then for fetch
 
 
