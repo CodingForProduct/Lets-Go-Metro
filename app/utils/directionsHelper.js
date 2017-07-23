@@ -31,7 +31,7 @@ var helpers = {
           });
 
           var directionObj = {};
-          directionObj["key"] = el.html_instructions;
+          directionObj["key"] = el.html_instructions.replace(/<\w+>/g, '').replace(/<\/\w+>/g, '').replace(/<.+>/g, '. ');
           directionsArr.push(
             directionObj
           );
@@ -51,7 +51,7 @@ var helpers = {
             });
             if (step.html_instructions){
               var directionObj = {};
-              directionObj["key"] = step.html_instructions;
+              directionObj["key"] = step.html_instructions.replace(/<\w+>/g, '').replace(/<\/\w+>/g, '').replace(/<.+>/g, '. ');
               directionsArr.push(directionObj);
             }
           });
