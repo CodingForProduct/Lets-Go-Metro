@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import helper from '../utils/directionsHelper';
 const decodePolyline = require('decode-google-map-polyline');
 import {
   View,
@@ -7,7 +8,8 @@ import {
   Image,
   Animated,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  FlatList
 } from 'react-native';
 
 // use Animated.event
@@ -38,9 +40,10 @@ export default class DirectionsBar extends Component {
       noHeight: new Animated.Value(0),
       noHeightBtn: new Animated.Value(0),
       componentHeight: new Animated.Value(100),
-      directionsHeight: 0,
-      inputHeight: 100,
-      directions: []
+      directionsHeight: new Animated.Value(0),
+      inputHeight: new Animated.Value(100),
+      textBoxHeight: 40,
+      directionsArr: []
     }
     this.setOriginText = this.setOriginText.bind(this);
     this.animateBar = this.animateBar.bind(this);
@@ -85,6 +88,7 @@ export default class DirectionsBar extends Component {
           console.log('THESE ARE DIRECTIONS WE ARE GETTING BACK FROM SERVER');
           // console.log(response);
           let responseData = JSON.parse(response._bodyInit);
+          console.log(responseData);
 
           let legs = responseData.routes[0].legs[0].steps;
           let stepsArr = [];
@@ -101,10 +105,21 @@ export default class DirectionsBar extends Component {
                 latitude: el.end_location.lat,
                 longitude: el.end_location.lng
               })
-              directionsArr.push(el.html_instructions);
+              // directionsArr.push(el.html_instructions);
+
+              var directionObj = {};
+              directionObj["key"] = el.html_instructions;
+              console.log('THIS IS DIRECTION OBJ INSIDE TRANSIT');
+              console.log(directionObj);
+              directionsArr.push(
+                directionObj
+              );
               transitDetails.push(el.transit_details);
             } else if (el.travel_mode === 'WALKING'){
-              directionsArr.push(el.html_instructions);
+              // the overview instructions
+              // let directionObj = {};
+              // directionObj["key"] = el.html_instructions;
+              // directionsArr.push(el.html_instructions);
               el.steps.forEach(step => {
                 stepsArr.push({
                   latitude: step.start_location.lat,
@@ -115,15 +130,24 @@ export default class DirectionsBar extends Component {
                   longitude: step.end_location.lng
                 });
                 if (step.html_instructions){
-                  directionsArr.push(step.html_instructions);
+                  // directionsArr.push(step.html_instructions);
+
+                  var directionObj = {};
+                  directionObj["key"] = step.html_instructions;
+                  directionsArr.push(
+                    directionObj
+                  );
                 }
               });
             }
           });
 
           console.log(transitDetails);
-
+          console.log('THIS IS DIRECTIONS ARR');
           console.log(directionsArr);
+          this.setState({
+            directionsArr: directionsArr
+          });
           this.props.updatePolylineCoord(stepsArr);
 
         });
@@ -200,13 +224,25 @@ export default class DirectionsBar extends Component {
     }
 
     if (prevState.showDirections != this.state.showDirections){
-        if (this.state.showDirections === true){
-          this.setState({
-            inputHeight: 0,
-            directionsHeight: 100,
-            noHeightBtn: 0
-          });
-        }
+      if (this.state.showDirections === true){
+        this.setState({
+          textBoxHeight: 0,
+        });
+        Animated.timing(
+          this.state.inputHeight,
+          {
+            toValue: 0,
+            duration: 500
+          }
+        ).start();
+        Animated.timing(
+          this.state.directionsHeight,
+          {
+            toValue: 100,
+            duration: 500
+          }
+        ).start();
+      }
     }
   }
 
@@ -260,16 +296,26 @@ export default class DirectionsBar extends Component {
         borderWidth: 0.5,
         borderColor: 'red',
         height: this.state.componentHeight}}>
-        <View style={{
+        <Animated.View style={{
           height: this.state.directionsHeight,
           flexDirection: 'row',
           borderRadius: 4,
           borderWidth: 0.5,
           borderColor: 'green',
           justifyContent: 'center',
+          backgroundColor: '#fff'
         }}>
-        </View>
-        <View style={{
+          <FlatList data={this.state.directions} renderItem={({el}) =>
+            <Text style={{height: 50,
+              borderRadius: 4,
+              borderWidth: 0.5,
+              borderColor: 'orange',
+              zIndex: 200
+            }}>{el.key}</Text>
+          }
+          />
+        </Animated.View>
+        <Animated.View style={{
           height: this.state.inputHeight,
           flexDirection: 'row',
           borderRadius: 4,
@@ -281,17 +327,31 @@ export default class DirectionsBar extends Component {
             <Image style={styles.markerImage} source={require('../images/direction_image.png')} />
           </View>
           <View style={styles.directionInput}>
-            <TextInput style={styles.inputText} placeholder="Current Location" value={this.state.originSelectionAddress} />
-            <TextInput style={styles.inputText} placeholder="Destination" onFocus={this.animateBar} onChangeText={this.setOriginText} />
+            <TextInput style={{
+              height: this.state.textBoxHeight,
+              borderRadius: 4,
+              borderWidth: 0.5,
+              borderColor: 'black',
+              width: 250,
+              paddingLeft: 10
+            }} placeholder="Current Location" value={this.state.originSelectionAddress} />
+            <TextInput style={{
+              height: this.state.textBoxHeight,
+              borderRadius: 4,
+              borderWidth: 0.5,
+              borderColor: 'black',
+              width: 250,
+              paddingLeft: 10
+            }} placeholder="Destination" onFocus={this.animateBar} onChangeText={this.setOriginText} />
           </View>
-        </View>
+        </Animated.View>
         <Animated.View style={{
           borderRadius: 4,
           borderWidth: 0.5,
           borderColor: 'blue',
           justifyContent: 'center',
           height: this.state.noHeight}}>
-            <TouchableOpacity onPress={this.chooseAddress1} style={{    borderWidth: 0.5,
+            <TouchableOpacity onPress={this.chooseAddress1} style={{borderWidth: 0.5,
                   borderColor: 'purple',
                   justifyContent: 'center',
                   height: this.state.noHeightBtn
