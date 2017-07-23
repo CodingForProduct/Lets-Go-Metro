@@ -11,15 +11,12 @@ import {
   FlatList
 } from 'react-native';
 
-// use Animated.event
-// if not, use Animated.timing and state to activate it inside componentDidUpdate
 const API_KEY = 'AIzaSyCdPnAPE-Kqy_VWKiFtX8Zm4b0T7wyyZ38',
   API_PLACES_ROOT = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?key=' + API_KEY,
   API_GEOCODE_ROOT = 'https://maps.googleapis.com/maps/api/geocode/json?key=' + API_KEY,
   API_DIRECTIONS_ROOT = 'https://maps.googleapis.com/maps/api/directions/json?key=' + API_KEY + '&mode=transit&unit=imperial';
 
-
-
+// Refactor: dont need originSelection or destinationSelection
 export default class DirectionsBar extends Component {
   constructor(props){
     super(props);
@@ -48,7 +45,8 @@ export default class DirectionsBar extends Component {
       inputHeight: new Animated.Value(100),
       textBoxHeight: 40,
       directionsArr: [],
-      inputFocus: ''
+      inputFocus: '',
+      triggerSearch: false
     }
     this.setOriginText = this.setOriginText.bind(this);
     this.setDestinationText = this.setDestinationText.bind(this);
@@ -249,14 +247,14 @@ export default class DirectionsBar extends Component {
   }
 
   chooseAddress1(){
-    console.log('CHOSE ADDRESS YAAAY');
     if (this.state.inputFocus == 'origin'){
       console.log('INSIDE ORIGIN CHOOSE ADDRESS 1');
       this.setState({
         originSelection: "suggestion1",
         originText: this.state.originSuggestion1,
         showPredictions: false,
-        showInput: true
+        showInput: true,
+        triggerSearch: true
       });
       console.log(this.state.originText);
     } else if (this.state.inputFocus == 'destination'){
@@ -264,26 +262,28 @@ export default class DirectionsBar extends Component {
         destinationSelection: "suggestion1",
         destinationText: this.state.destinationSuggestion1,
         showPredictions: false,
-        showInput: true
+        showInput: true,
+        triggerSearch: true
       });
     }
   }
 
   chooseAddress2(){
-    console.log('CHOSE ADDRESS MEE');
     if (this.state.inputFocus == 'origin'){
       this.setState({
         originSelection: "suggestion2",
         originText: this.state.originSuggestion2,
         showPredictions: false,
-        showInput: true
+        showInput: true,
+        triggerSearch: true
       });
     } else if (this.state.inputFocus == 'destination'){
       this.setState({
         destinationSelection: "suggestion2",
         destinationText: this.state.destinationSuggestion2,
         showPredictions: false,
-        showInput: true
+        showInput: true,
+        triggerSearch: true
       });
     }
   }
@@ -313,7 +313,8 @@ export default class DirectionsBar extends Component {
           backgroundColor: '#fff'
         }}>
           <FlatList data={this.state.directionsArr} renderItem={({item}) =>
-            <Text style={{height: 50,
+            <Text style={{
+              height: 50,
               borderRadius: 4,
               borderWidth: 0.5,
               borderColor: 'orange',
