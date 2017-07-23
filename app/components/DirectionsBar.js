@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import helper from '../utils/directionsHelper';
-const decodePolyline = require('decode-google-map-polyline');
 import {
   View,
+  ScrollView,
   TextInput,
   StyleSheet,
   Image,
@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   FlatList
 } from 'react-native';
-
+import { List, ListItem } from "react-native-elements";
 // use Animated.event
 // if not, use Animated.timing and state to activate it inside componentDidUpdate
 const API_KEY = 'AIzaSyCdPnAPE-Kqy_VWKiFtX8Zm4b0T7wyyZ38',
@@ -140,11 +140,15 @@ export default class DirectionsBar extends Component {
                 }
               });
             }
+            this.setState({
+              directionsArr: directionsArr
+            })
           });
 
           console.log(transitDetails);
           console.log('THIS IS DIRECTIONS ARR');
           console.log(directionsArr);
+          // 🦋
           this.setState({
             directionsArr: directionsArr
           });
@@ -283,44 +287,48 @@ export default class DirectionsBar extends Component {
 
   render(){
     return(
+
       <Animated.View style={{
         flexDirection: 'column',
         position: 'absolute',
         left: 0,
         bottom: 0,
         width: '100%',
-        backgroundColor: '#fff',
+        backgroundColor: 'rgb(42, 88, 189)',
         zIndex: 100,
         // paddingBottom: 15,
         borderRadius: 4,
         borderWidth: 0.5,
-        borderColor: 'red',
+        borderColor: 'rgb(42, 88, 189)',
         height: this.state.componentHeight}}>
         <Animated.View style={{
           height: this.state.directionsHeight,
           flexDirection: 'row',
           borderRadius: 4,
           borderWidth: 0.5,
-          borderColor: 'green',
+
           justifyContent: 'center',
           backgroundColor: '#fff'
         }}>
-          <FlatList data={this.state.directions} renderItem={({el}) =>
-            <Text style={{height: 50,
-              borderRadius: 4,
-              borderWidth: 0.5,
-              borderColor: 'orange',
-              zIndex: 200
-            }}>{el.key}</Text>
+        <ScrollView>
+          <List containerStyle={{marginBottom: 10}}>
+          {
+            this.state.directionsArr.map((item, i) =>(
+             <ListItem
+             key ={i}
+             title ={item.key}
+             />
+            ))
           }
-          />
+          </List>
+          </ScrollView>
         </Animated.View>
         <Animated.View style={{
           height: this.state.inputHeight,
           flexDirection: 'row',
           borderRadius: 4,
           borderWidth: 0.5,
-          borderColor: 'green',
+
           justifyContent: 'center',
         }}>
           <View style={styles.directionImage}>
@@ -329,30 +337,34 @@ export default class DirectionsBar extends Component {
           <View style={styles.directionInput}>
             <TextInput style={{
               height: this.state.textBoxHeight,
-              borderRadius: 4,
-              borderWidth: 0.5,
-              borderColor: 'black',
+              borderRadius: 0,
+              borderWidth: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+
               width: 250,
               paddingLeft: 10
             }} placeholder="Current Location" value={this.state.originSelectionAddress} />
             <TextInput style={{
               height: this.state.textBoxHeight,
-              borderRadius: 4,
-              borderWidth: 0.5,
-              borderColor: 'black',
+              borderRadius: 0,
+              borderWidth: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+
               width: 250,
               paddingLeft: 10
-            }} placeholder="Destination" onFocus={this.animateBar} onChangeText={this.setOriginText} />
+            }}
+            placeholderTextColor ="rgba(255, 255, 255, 0.7)"
+            placeholder="Destination" onFocus={this.animateBar} onChangeText={this.setOriginText} />
           </View>
         </Animated.View>
         <Animated.View style={{
-          borderRadius: 4,
-          borderWidth: 0.5,
+          borderRadius: 0,
+          borderWidth: 0,
           borderColor: 'blue',
           justifyContent: 'center',
           height: this.state.noHeight}}>
-            <TouchableOpacity onPress={this.chooseAddress1} style={{borderWidth: 0.5,
-                  borderColor: 'purple',
+            <TouchableOpacity onPress={this.chooseAddress1} style={{borderWidth: 0,
+
                   justifyContent: 'center',
                   height: this.state.noHeightBtn
               }}>
@@ -362,8 +374,8 @@ export default class DirectionsBar extends Component {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={this.chooseAddress2} style={{    borderWidth: 0.5,
-                  borderColor: 'purple',
+            <TouchableOpacity onPress={this.chooseAddress2} style={{    borderWidth: 0,
+
                   justifyContent: 'center',
                   height: this.state.noHeightBtn
               }}>
@@ -375,6 +387,7 @@ export default class DirectionsBar extends Component {
             </TouchableOpacity>
         </Animated.View>
       </Animated.View>
+
     )
   }
 }
