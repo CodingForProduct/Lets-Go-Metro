@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-const decodePolyline = require('decode-google-map-polyline');
+import helper from '../utils/directionsHelper';
 import {
   View,
   TextInput,
@@ -7,7 +7,8 @@ import {
   Image,
   Animated,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
+  FlatList
 } from 'react-native';
 
 // use Animated.event
@@ -23,25 +24,38 @@ export default class DirectionsBar extends Component {
   constructor(props){
     super(props);
     this.state = {
-      originSelectionAddress: "",
-      originSelectionCoord: {
+      currentPosition: {
         latitude: "",
         longitude: ""
       },
+      originText: "",
       destinationText: "",
+      suggestion1: "",
+      suggestion2: "",
+      originSuggestion1: "",
+      originSuggestion2: "",
       destinationSuggestion1: "",
       destinationSuggestion2: "",
+      originSelection: "",
       destinationSelection: "",
       showPredictions: false,
+      showInput: true,
+      showDirections: false,
       noHeight: new Animated.Value(0),
       noHeightBtn: new Animated.Value(0),
-      someHeight: new Animated.Value(100),
-      directions: []
+      componentHeight: new Animated.Value(100),
+      directionsHeight: new Animated.Value(0),
+      inputHeight: new Animated.Value(100),
+      textBoxHeight: 40,
+      directionsArr: [],
+      inputFocus: ''
     }
     this.setOriginText = this.setOriginText.bind(this);
-    this.animateBar = this.animateBar.bind(this);
+    this.setDestinationText = this.setDestinationText.bind(this);
     this.chooseAddress1 = this.chooseAddress1.bind(this);
     this.chooseAddress2 = this.chooseAddress2.bind(this);
+    this.setA = this.setA.bind(this);
+    this.setB = this.setB.bind(this);
   }
 
   componentDidMount() {
@@ -50,11 +64,15 @@ export default class DirectionsBar extends Component {
       fetch(endpt, {
         method: 'GET'
       }).then(response => {
+        // console.log(response);
+        // console.log(typeof response._bodyInit);
+
         this.setState({
-          originSelectionAddress: JSON.parse(response._bodyInit).results[0].formatted_address,
-          originSelectionCoord: {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
+          originText: JSON.parse(response._bodyInit).results[0].formatted_address,
+          originSelection: JSON.parse(response._bodyInit).results[0].formatted_address,
+          currentPosition: {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
           }
         });
       }).catch(err => {
@@ -64,102 +82,63 @@ export default class DirectionsBar extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    // need to fix below later
+    if ((prevState.destinationSelection != this.state.destinationSelection || prevState.originSelection != this.state.originSelection) && (this.state.originText && this.state.destinationSelection)){
+      console.log('INSIDE GET ADDRESS IF');
+      var destinationStr = this.state.destinationSelection == 'suggestion1' ? this.state.destinationSuggestion1 : this.state.destinationSuggestion2;
+      var originStr = this.state.originSelection == 'suggestion1' ? this.state.originSuggestion1 : this.state.originSelection == 'suggestion2' ? this.state.originSuggestion2 : this.state.originText
 
-    // making the call for directions
-    if (prevState.destinationSelection != this.state.destinationSelection && (this.state.destinationSelection && this.state.originSelectionAddress)){
-
-      if (this.state.destinationSelection == 'suggestion1'){
-        var qsDestination = this.state.destinationSuggestion1.split(' ').join('+');
-        var qsOrigin = this.state.originSelectionAddress.split(' ').join('+')
-        let endpt = API_DIRECTIONS_ROOT + '&origin=' + qsOrigin + '&destination=' + qsDestination;
-        console.log('THIS IS THE ENDPT');
-        console.log(endpt);
-
-        fetch(endpt, {
-          method: 'GET'
-        }).then(response => {
-          console.log('THESE ARE DIRECTIONS WE ARE GETTING BACK FROM SERVER');
-          // console.log(response);
-          let responseData = JSON.parse(response._bodyInit);
-
-          let legs = responseData.routes[0].legs[0].steps;
-          let stepsArr = [];
-          let directionsArr = [];
-          let transitDetails = [];
-
-          legs.forEach(el => {
-            if (el.travel_mode === 'TRANSIT'){
-              stepsArr.push({
-                latitude: el.start_location.lat,
-                longitude: el.start_location.lng
-              });
-              stepsArr.push({
-                latitude: el.end_location.lat,
-                longitude: el.end_location.lng
-              })
-              directionsArr.push(el.html_instructions);
-              transitDetails.push(el.transit_details);
-            } else if (el.travel_mode === 'WALKING'){
-              directionsArr.push(el.html_instructions);
-              el.steps.forEach(step => {
-                stepsArr.push({
-                  latitude: step.start_location.lat,
-                  longitude: step.start_location.lng
-                });
-                stepsArr.push({
-                  latitude: step.end_location.lat,
-                  longitude: step.end_location.lng
-                });
-                if (step.html_instructions){
-                  directionsArr.push(step.html_instructions);
-                }
-              });
-            }
-          });
-
-          console.log(transitDetails);
-
-          console.log(directionsArr);
-          this.props.updatePolylineCoord(stepsArr);
-
+      helper.getDirections(destinationStr, originStr)
+      .then(objArrs => {
+        this.setState({
+          directionsArr: objArrs.directionsArr,
+          showDirections: true,
+          showPredictions: false,
+          showInput: false
         });
+        this.props.updatePolylineCoord(objArrs.stepsArr);
+      });
+    }
 
-      } else if (this.state.destinationSelection == 'suggestion2'){
-
-      }
-    } // closes prevState & thisState
-
-
-    // make call for suggestions
+    // make call for suggestions -- change data
     if (prevState.destinationText != this.state.destinationText){
-      // console.log('THIS IS THE CURRENT TEXT');
-      // console.log(this.state.destinationText);
-      // console.log('MAKING A FETCH');
-      var qs = this.state.destinationText.split(' ').join('+');
-
-      fetch(API_PLACES_ROOT + '&input=' + qs, {
-        method: 'GET'
-      }).then((response) => {
-        var predictionsArr = JSON.parse(response._bodyInit).predictions;
+      helper.getPredictions(this.state.destinationText).then(predictionsArr => {
         if (predictionsArr.length > 1){
           this.setState({
             destinationSuggestion1: predictionsArr[0].description,
-            destinationSuggestion2: predictionsArr[1].description
+            destinationSuggestion2: predictionsArr[1].description,
+            suggestion1: predictionsArr[0].description,
+            suggestion2: predictionsArr[1].description
           });
         }
-      }).catch((err) => {
+      }).catch(err => {
         console.log(err);
       });
     }
 
-    // expand bar
+    if (prevState.originText != this.state.originText){
+      helper.getPredictions(this.state.originText).then(predictionsArr => {
+        if (predictionsArr.length > 1){
+          this.setState({
+            originSuggestion1: predictionsArr[0].description,
+            originSuggestion2: predictionsArr[1].description,
+            suggestion1: predictionsArr[0].description,
+            suggestion2: predictionsArr[1].description
+          });
+        }
+      }).catch(err => {
+        console.log(err);
+      });
+    }
+
+    // expand bar -- change view
     if (prevState.showPredictions != this.state.showPredictions){
       if (this.state.showPredictions === true){
         this.setState({
           noHeightBtn: 40
         });
         Animated.timing(
-          this.state.someHeight,
+          this.state.componentHeight,
           {
             toValue: 200,
             duration: 500,
@@ -173,13 +152,12 @@ export default class DirectionsBar extends Component {
           }
         ).start();
 
-      }
-      else {
+      } else {
         this.setState({
           noHeightBtn: 0
         });
         Animated.timing(
-          this.state.someHeight,
+          this.state.componentHeight,
           {
             toValue: 100,
             duration: 500,
@@ -188,8 +166,48 @@ export default class DirectionsBar extends Component {
         Animated.timing(
           this.state.noHeight,
           {
-            toValue: 1,
+            toValue: 0,
             duration: 500,
+          }
+        ).start();
+      }
+    }
+
+    if (prevState.showDirections != this.state.showDirections){
+      if (this.state.showDirections === true){
+        this.setState({
+          textBoxHeight: 0,
+        });
+        Animated.timing(
+          this.state.inputHeight,
+          {
+            toValue: 0,
+            duration: 500
+          }
+        ).start();
+        Animated.timing(
+          this.state.directionsHeight,
+          {
+            toValue: 100,
+            duration: 500
+          }
+        ).start();
+      } else {
+          this.setState({
+          textBoxHeight: 40,
+        });
+        Animated.timing(
+          this.state.inputHeight,
+          {
+            toValue: 100,
+            duration: 500
+          }
+        ).start();
+        Animated.timing(
+          this.state.directionsHeight,
+          {
+            toValue: 0,
+            duration: 500
           }
         ).start();
       }
@@ -198,40 +216,79 @@ export default class DirectionsBar extends Component {
 
   setOriginText(text){
     console.log('INSIDE SET ORIGIN TEXT');
-    console.log(text);
     this.setState({
-      destinationText: text
+      originText: text,
+      showPredictions: true,
+      showInput: true,
+      showDirections: false
     });
   }
 
-  animateBar(){
-    console.log('ANIMATEBAR CONSOLE LOG');
+  setDestinationText(text){
+    console.log('INSIDE SET DESTINATION TEXT');
     this.setState({
-      showPredictions: true
-    })
+      destinationText: text,
+      showPredictions: true,
+      showInput: true,
+      showDirections: false
+    });
+  }
+
+  setA(){
+    console.log('SET A');
+    this.setState({
+      inputFocus: 'origin'
+    });
+  }
+
+  setB(){
+    console.log('SET B');
+    this.setState({
+      inputFocus: 'destination'
+    });
   }
 
   chooseAddress1(){
-    console.log('CHOSE ADDRESS');
-    this.setState({
-      destinationSelection: "suggestion1",
-      showPredictions: false
-    });
+    console.log('CHOSE ADDRESS YAAAY');
+    if (this.state.inputFocus == 'origin'){
+      console.log('INSIDE ORIGIN CHOOSE ADDRESS 1');
+      this.setState({
+        originSelection: "suggestion1",
+        originText: this.state.originSuggestion1,
+        showPredictions: false,
+        showInput: true
+      });
+      console.log(this.state.originText);
+    } else if (this.state.inputFocus == 'destination'){
+      this.setState({
+        destinationSelection: "suggestion1",
+        destinationText: this.state.destinationSuggestion1,
+        showPredictions: false,
+        showInput: true
+      });
+    }
   }
 
   chooseAddress2(){
-    console.log('CHOSE ADDRESS');
-    this.setState({
-      destinationSelection: "suggestion2",
-      showPredictions: false
-    });
+    console.log('CHOSE ADDRESS MEE');
+    if (this.state.inputFocus == 'origin'){
+      this.setState({
+        originSelection: "suggestion2",
+        originText: this.state.originSuggestion2,
+        showPredictions: false,
+        showInput: true
+      });
+    } else if (this.state.inputFocus == 'destination'){
+      this.setState({
+        destinationSelection: "suggestion2",
+        destinationText: this.state.destinationSuggestion2,
+        showPredictions: false,
+        showInput: true
+      });
+    }
   }
 
   render(){
-    // let { someHeight } = this.state.someHeight;
-    // let { noHeight } = this.state.noHeight;
-    // console.log('RENDERING AGAIN');
-
     return(
       <Animated.View style={{
         flexDirection: 'column',
@@ -241,45 +298,93 @@ export default class DirectionsBar extends Component {
         width: '100%',
         backgroundColor: '#fff',
         zIndex: 100,
-        paddingBottom: 15,
+        // paddingBottom: 15,
         borderRadius: 4,
         borderWidth: 0.5,
         borderColor: 'red',
-        height: this.state.someHeight}}>
-        <View style={styles.directionBar}>
+        height: this.state.componentHeight}}>
+        <Animated.View style={{
+          height: this.state.directionsHeight,
+          flexDirection: 'row',
+          borderRadius: 4,
+          borderWidth: 0.5,
+          borderColor: 'green',
+          justifyContent: 'center',
+          backgroundColor: '#fff'
+        }}>
+          <FlatList data={this.state.directionsArr} renderItem={({item}) =>
+            <Text style={{height: 50,
+              borderRadius: 4,
+              borderWidth: 0.5,
+              borderColor: 'orange',
+              zIndex: 200
+            }}>{item.key}</Text>
+          }
+          />
+        </Animated.View>
+        <Animated.View style={{
+          height: this.state.inputHeight,
+          flexDirection: 'row',
+          borderRadius: 4,
+          borderWidth: 0.5,
+          borderColor: 'green',
+          justifyContent: 'center',
+        }}>
           <View style={styles.directionImage}>
             <Image style={styles.markerImage} source={require('../images/direction_image.png')} />
           </View>
           <View style={styles.directionInput}>
-            <TextInput style={styles.inputText} placeholder="Current Location" value={this.state.originSelectionAddress} />
-            <TextInput style={styles.inputText} placeholder="Destination" onFocus={this.animateBar} onChangeText={this.setOriginText} />
+            <TextInput style={{
+              height: this.state.textBoxHeight,
+              borderRadius: 4,
+              borderWidth: 0.5,
+              borderColor: 'black',
+              width: 250,
+              paddingLeft: 10
+            }} placeholder="Current Location"
+            value={this.state.originText}
+            onFocus={this.setA}
+            onChangeText={this.setOriginText}
+            />
+            <TextInput style={{
+              height: this.state.textBoxHeight,
+              borderRadius: 4,
+              borderWidth: 0.5,
+              borderColor: 'black',
+              width: 250,
+              paddingLeft: 10
+            }} placeholder="Destination"
+            value={this.state.destinationText}
+            onFocus={this.setB}
+            onChangeText={this.setDestinationText}
+            />
           </View>
-        </View>
+        </Animated.View>
         <Animated.View style={{
           borderRadius: 4,
           borderWidth: 0.5,
           borderColor: 'blue',
           justifyContent: 'center',
           height: this.state.noHeight}}>
-            <TouchableOpacity onPress={this.chooseAddress1} style={{    borderWidth: 0.5,
+            <TouchableOpacity onPress={this.chooseAddress1} style={{borderWidth: 0.5,
                   borderColor: 'purple',
                   justifyContent: 'center',
                   height: this.state.noHeightBtn
               }}>
               <View>
                 <Text>
-                  {this.state.destinationSuggestion1}
+                  {this.state.suggestion1}
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={this.chooseAddress2} style={{    borderWidth: 0.5,
+            <TouchableOpacity onPress={this.chooseAddress2} style={{borderWidth: 0.5,
                   borderColor: 'purple',
                   justifyContent: 'center',
                   height: this.state.noHeightBtn
               }}>
               <View>
                 <Text>
-                  {this.state.destinationSuggestion2}
+                  {this.state.suggestion2}
                 </Text>
               </View>
             </TouchableOpacity>
