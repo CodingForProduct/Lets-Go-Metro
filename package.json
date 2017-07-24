@@ -1,25 +1,26 @@
 {
-	"name": "letsGoMetro",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"start": "node node_modules/react-native/local-cli/cli.js start",
-		"test": "jest"
-	},
-	"dependencies": {
-		"decode-google-map-polyline": "^1.0.1",
-		"prop-types": "^15.5.10",
-		"react": "16.0.0-alpha.6",
-		"react-native": "0.44.0",
-		"react-native-maps": "^0.15.3"
-	},
-	"devDependencies": {
-		"babel-jest": "20.0.3",
-		"babel-preset-react-native": "2.0.0",
-		"jest": "20.0.4",
-		"react-test-renderer": "16.0.0-alpha.12"
-	},
-	"jest": {
-		"preset": "react-native"
-	}
+  "name": "letsGoMetro",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "decode-google-map-polyline": "^1.0.1",
+    "react": "16.0.0-alpha.6",
+    "react-native": "0.44.0",
+    "react-native-elements": "^0.15.0",
+    "react-native-maps": "^0.15.3",
+    "react-native-vector-icons": "^4.2.0"
+  },
+  "devDependencies": {
+    "babel-jest": "20.0.3",
+    "babel-preset-react-native": "2.0.0",
+    "jest": "20.0.4",
+    "react-test-renderer": "16.0.0-alpha.12"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
 }

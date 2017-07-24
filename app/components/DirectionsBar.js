@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import helper from '../utils/directionsHelper';
 import {
   View,
+  ScrollView,
   TextInput,
   StyleSheet,
   Image,
@@ -10,16 +11,16 @@ import {
   TouchableOpacity,
   FlatList
 } from 'react-native';
-
+import { List, ListItem } from "react-native-elements";
 // use Animated.event
 // if not, use Animated.timing and state to activate it inside componentDidUpdate
+
 const API_KEY = 'AIzaSyCdPnAPE-Kqy_VWKiFtX8Zm4b0T7wyyZ38',
   API_PLACES_ROOT = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?key=' + API_KEY,
   API_GEOCODE_ROOT = 'https://maps.googleapis.com/maps/api/geocode/json?key=' + API_KEY,
   API_DIRECTIONS_ROOT = 'https://maps.googleapis.com/maps/api/directions/json?key=' + API_KEY + '&mode=transit&unit=imperial';
 
-
-
+// Refactor: dont need originSelection or destinationSelection
 export default class DirectionsBar extends Component {
   constructor(props){
     super(props);
@@ -48,7 +49,8 @@ export default class DirectionsBar extends Component {
       inputHeight: new Animated.Value(100),
       textBoxHeight: 40,
       directionsArr: [],
-      inputFocus: ''
+      inputFocus: '',
+      triggerSearch: false
     }
     this.setOriginText = this.setOriginText.bind(this);
     this.setDestinationText = this.setDestinationText.bind(this);
@@ -249,14 +251,14 @@ export default class DirectionsBar extends Component {
   }
 
   chooseAddress1(){
-    console.log('CHOSE ADDRESS YAAAY');
     if (this.state.inputFocus == 'origin'){
       console.log('INSIDE ORIGIN CHOOSE ADDRESS 1');
       this.setState({
         originSelection: "suggestion1",
         originText: this.state.originSuggestion1,
         showPredictions: false,
-        showInput: true
+        showInput: true,
+        triggerSearch: true
       });
       console.log(this.state.originText);
     } else if (this.state.inputFocus == 'destination'){
@@ -264,70 +266,76 @@ export default class DirectionsBar extends Component {
         destinationSelection: "suggestion1",
         destinationText: this.state.destinationSuggestion1,
         showPredictions: false,
-        showInput: true
+        showInput: true,
+        triggerSearch: true
       });
     }
   }
 
   chooseAddress2(){
-    console.log('CHOSE ADDRESS MEE');
     if (this.state.inputFocus == 'origin'){
       this.setState({
         originSelection: "suggestion2",
         originText: this.state.originSuggestion2,
         showPredictions: false,
-        showInput: true
+        showInput: true,
+        triggerSearch: true
       });
     } else if (this.state.inputFocus == 'destination'){
       this.setState({
         destinationSelection: "suggestion2",
         destinationText: this.state.destinationSuggestion2,
         showPredictions: false,
-        showInput: true
+        showInput: true,
+        triggerSearch: true
       });
     }
   }
 
   render(){
     return(
+
       <Animated.View style={{
         flexDirection: 'column',
         position: 'absolute',
         left: 0,
         bottom: 0,
         width: '100%',
-        backgroundColor: '#fff',
+        backgroundColor: 'rgb(42, 88, 189)',
         zIndex: 100,
         // paddingBottom: 15,
         borderRadius: 4,
         borderWidth: 0.5,
-        borderColor: 'red',
+        borderColor: 'rgb(42, 88, 189)',
         height: this.state.componentHeight}}>
         <Animated.View style={{
           height: this.state.directionsHeight,
           flexDirection: 'row',
           borderRadius: 4,
           borderWidth: 0.5,
-          borderColor: 'green',
+
           justifyContent: 'center',
           backgroundColor: '#fff'
         }}>
-          <FlatList data={this.state.directionsArr} renderItem={({item}) =>
-            <Text style={{height: 50,
-              borderRadius: 4,
-              borderWidth: 0.5,
-              borderColor: 'orange',
-              zIndex: 200
-            }}>{item.key}</Text>
+        <ScrollView>
+          <List containerStyle={{marginBottom: 10}}>
+          {
+            this.state.directionsArr.map((item, i) =>(
+             <ListItem
+             key ={i}
+             title ={item.key}
+             />
+            ))
           }
-          />
+          </List>
+          </ScrollView>
         </Animated.View>
         <Animated.View style={{
           height: this.state.inputHeight,
           flexDirection: 'row',
           borderRadius: 4,
           borderWidth: 0.5,
-          borderColor: 'green',
+
           justifyContent: 'center',
         }}>
           <View style={styles.directionImage}>
@@ -336,9 +344,10 @@ export default class DirectionsBar extends Component {
           <View style={styles.directionInput}>
             <TextInput style={{
               height: this.state.textBoxHeight,
-              borderRadius: 4,
-              borderWidth: 0.5,
-              borderColor: 'black',
+              borderRadius: 0,
+              borderWidth: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+
               width: 250,
               paddingLeft: 10
             }} placeholder="Current Location"
@@ -348,12 +357,14 @@ export default class DirectionsBar extends Component {
             />
             <TextInput style={{
               height: this.state.textBoxHeight,
-              borderRadius: 4,
-              borderWidth: 0.5,
-              borderColor: 'black',
+              borderRadius: 0,
+              borderWidth: 0,
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+
               width: 250,
               paddingLeft: 10
             }} placeholder="Destination"
+            placeholderTextColor ="rgba(255, 255, 255, 0.7)"
             value={this.state.destinationText}
             onFocus={this.setB}
             onChangeText={this.setDestinationText}
@@ -361,13 +372,13 @@ export default class DirectionsBar extends Component {
           </View>
         </Animated.View>
         <Animated.View style={{
-          borderRadius: 4,
-          borderWidth: 0.5,
+          borderRadius: 0,
+          borderWidth: 0,
           borderColor: 'blue',
           justifyContent: 'center',
           height: this.state.noHeight}}>
-            <TouchableOpacity onPress={this.chooseAddress1} style={{borderWidth: 0.5,
-                  borderColor: 'purple',
+            <TouchableOpacity onPress={this.chooseAddress1} style={{borderWidth: 0,
+
                   justifyContent: 'center',
                   height: this.state.noHeightBtn
               }}>
@@ -377,10 +388,9 @@ export default class DirectionsBar extends Component {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={this.chooseAddress2} style={{borderWidth: 0.5,
-                  borderColor: 'purple',
-                  justifyContent: 'center',
-                  height: this.state.noHeightBtn
+            <TouchableOpacity onPress={this.chooseAddress2} style={{
+                justifyContent: 'center',
+                height: this.state.noHeightBtn
               }}>
               <View>
                 <Text>
@@ -390,6 +400,7 @@ export default class DirectionsBar extends Component {
             </TouchableOpacity>
         </Animated.View>
       </Animated.View>
+
     )
   }
 }
