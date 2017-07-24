@@ -15,7 +15,7 @@ export default class Information extends Component {
         </View>
         <View style={styles.informationText}>
           <Text>
-            Hi, I'm Metro Driver. I will help you get where you need to go.
+            Hi, I'm Metro Driver. I will help you get where you need to go. Tap me whenever you want to set the directions.
           </Text>
         </View>
       </View>
@@ -30,13 +30,22 @@ const styles = StyleSheet.create({
   },
   information: {
     // ...StyleSheet.absoluteFillObject,
-    flex: 0.5,
+    // flex: 0.5,
     // height: 180,
     flexDirection: 'row',
-    justifyContent: 'center',
-    // borderRadius: 4,
-    // borderWidth: 0.5,
-    // borderColor: 'red',
+    // justifyContent: 'center',
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: 'red',
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    height: 130,
+    width: '100%',
+    backgroundColor: '#fff',
+    zIndex: 100,
+    //top padding to account for the iphone status bar
+    paddingTop: 15
   },
   informationImage: {
     width: 80,
@@ -50,7 +59,7 @@ const styles = StyleSheet.create({
     width: 250,
     height: 80,
     marginTop: 30,
-    padding: 20,
+    padding: 15,
     // borderRadius: 4,
     // borderWidth: 0.5,
     // borderColor: 'orange',

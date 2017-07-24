@@ -7,7 +7,12 @@ import {
 } from 'react-native';
 import MapView from 'react-native-maps';
 
-const LATITUDE_DELTA = 0.5, LONGITUDE_DELTA = 0.45, LATITUDE_DELTA_ZOOM = 0.02, LONGITUDE_DELTA_ZOOM = 0.015
+const LATITUDE_DELTA = 0.5,
+  LONGITUDE_DELTA = 0.45,
+  LATITUDE_DELTA_ZOOM = 0.02,
+  LONGITUDE_DELTA_ZOOM = 0.015,
+  ZOOM_IN_FACTOR = 0.005,
+  ZOOM_OUT_FACTOR = 0.01
 
 export default class MetroMap extends Component {
   constructor(props){
@@ -18,7 +23,8 @@ export default class MetroMap extends Component {
         longitude: -118.2389,
         latitudeDelta: LATITUDE_DELTA,
         longitudeDelta: LONGITUDE_DELTA
-      }
+      },
+      polylineCoord: [{latitude: 0, longitude: 0}, {latitude: 0, longitude: 0}]
     };
     this.zoomIn = this.zoomIn.bind(this);
     this.zoomOut = this.zoomOut.bind(this);
@@ -45,8 +51,8 @@ export default class MetroMap extends Component {
         region: {
           latitude: this.state.region.latitude,
           longitude: this.state.region.longitude,
-          latitudeDelta: this.state.region.latitudeDelta - 0.005,
-          longitudeDelta: this.state.region.longitudeDelta - 0.005
+          latitudeDelta: this.state.region.latitudeDelta - ZOOM_IN_FACTOR,
+          longitudeDelta: this.state.region.longitudeDelta - ZOOM_IN_FACTOR
         }
       });
       console.log(this.state.region.latitudeDelta);
@@ -62,12 +68,19 @@ export default class MetroMap extends Component {
         region: {
           latitude: this.state.region.latitude,
           longitude: this.state.region.longitude,
-          latitudeDelta: this.state.region.latitudeDelta + 0.01,
-          longitudeDelta: this.state.region.longitudeDelta + 0.01
+          latitudeDelta: this.state.region.latitudeDelta + ZOOM_OUT_FACTOR,
+          longitudeDelta: this.state.region.longitudeDelta + ZOOM_OUT_FACTOR
         }
       });
     }
   }
+
+//TEST
+// [ { lat: 0.00014, lng: 8913.93592 },
+//    { lat: 0.00022, lng: 3769.98278 } ]
+
+        // latitude: 34.0498,
+        // longitude: -118.2389,
 
   render(){
     return(
@@ -85,6 +98,8 @@ export default class MetroMap extends Component {
         <MapView
           style={styles.map}
           region={this.state.region}>
+          <MapView.Marker coordinate={{latitude: this.state.region.latitude, longitude: this.state.region.longitude}} />
+          <MapView.Polyline coordinates={this.props.polylineCoord}/>
         </MapView>
       </View>
     );
@@ -94,15 +109,21 @@ export default class MetroMap extends Component {
 const styles = StyleSheet.create({
   container: {
     // ...StyleSheet.absoluteFillObject,
-    flex: 2,
+    // flex: 2,
     // height: 400,
     // justifyContent: 'flex-end',
     // alignItems: 'center',
     // alignItems: 'stretch',
-    position: 'relative'
+    // position: 'relative'
     // borderRadius: 4,
     // borderWidth: 0.5,
     // borderColor: 'blue',
+    position: 'relative',
+    height: '100%',
+    width: '100%',
+    paddingTop: 100,
+    paddingBottom: 100,
+    backgroundColor: 'green'
   },
   map: {
     ...StyleSheet.absoluteFillObject,
@@ -117,7 +138,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     position: 'absolute',
     zIndex: 999,
-    top: 10,
+    top: 140,
     right: 40,
     borderRadius: 4,
     borderWidth: 0.5,
@@ -132,7 +153,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     position: 'absolute',
     zIndex: 999,
-    top: 10,
+    top: 140,
     right: 18,
     borderRadius: 4,
     borderWidth: 0.5,

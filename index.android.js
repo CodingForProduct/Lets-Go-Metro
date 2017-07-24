@@ -1,57 +1,23 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, { Component } from 'react';
 import {
   AppRegistry,
-  StyleSheet,
-  Text,
-  View
+  View,
 } from 'react-native';
-import MapView from 'react-native-maps';
+import Information from './app/components/Information';
+import MetroMap from './app/components/MetroMap';
+import DirectionsBar from './app/components/DirectionsBar';
+
 
 export default class letsGoMetro extends Component {
   render() {
     return (
-      <View style={styles.container}>
-        <MapView
-          style={styles.map}
-          region={{
-          latitude: 34.0498,
-          longitude: -118.2389,
-          latitudeDelta: 0.5,
-          longitudeDelta: 0.45
-        }}>
-        </MapView>
+      <View style={{flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center'}}>
+        <Information />
+        <MetroMap />
+        <DirectionsBar />
       </View>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    ...StyleSheet.absoluteFillObject,
-    height: 400,
-    width: 400,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
 
 AppRegistry.registerComponent('letsGoMetro', () => letsGoMetro);
