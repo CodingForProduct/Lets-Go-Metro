@@ -16,14 +16,21 @@ export default class letsGoMetro extends Component {
     super();
     this.state = {
       polylineCoord: [{latitude: 0, longitude: 0}, {latitude: 0, longitude: 0}],
-      layoutState: 0
+      transitDetails: []
     };
     this.updatePolylineCoord = this.updatePolylineCoord.bind(this);
+    this.setMarkers = this.setMarkers.bind(this);
   }
 
   updatePolylineCoord(arr){
     this.setState({
       polylineCoord: arr
+    });
+  }
+
+  setMarkers(arr){
+    this.setState({
+      transitDetails: arr
     });
   }
 
@@ -36,8 +43,8 @@ export default class letsGoMetro extends Component {
     return (
       <View style={{flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center'}}>
         <Information />
-        <MetroMap polylineCoord={this.state.polylineCoord} />
-        <DirectionsBar updatePolylineCoord={this.updatePolylineCoord}/>
+        <MetroMap polylineCoord={this.state.polylineCoord} transitDetails={this.state.transitDetails} />
+        <DirectionsBar updatePolylineCoord={this.updatePolylineCoord} setMarkers={this.setMarkers} />
       </View>
     );
   }

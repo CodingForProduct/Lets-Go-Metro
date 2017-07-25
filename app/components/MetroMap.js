@@ -83,6 +83,22 @@ export default class MetroMap extends Component {
         // longitude: -118.2389,
 
   render(){
+    var arrivalPoints = this.props.transitDetails.map((el, idx) =>{
+      return(
+        <MapView.Marker
+        key={idx}
+        coordinate={{latitude: el.arrival_stop.location.lat, longitude: el.arrival_stop.location.lng}} />
+      );
+    });
+
+    var departurePoints = this.props.transitDetails.map((el, idx) =>{
+      return(
+        <MapView.Marker
+        key={idx}
+        coordinate={{latitude: el.departure_stop.location.lat, longitude: el.departure_stop.location.lng}} />
+      );
+    });
+
     return(
       <View style={styles.container}>
         <TouchableOpacity onPress={this.zoomIn} style={styles.leftButton}>
@@ -99,6 +115,8 @@ export default class MetroMap extends Component {
           style={styles.map}
           region={this.state.region}>
           <MapView.Marker coordinate={{latitude: this.state.region.latitude, longitude: this.state.region.longitude}} />
+          {arrivalPoints}
+          {departurePoints}
           <MapView.Polyline coordinates={this.props.polylineCoord}/>
         </MapView>
       </View>
