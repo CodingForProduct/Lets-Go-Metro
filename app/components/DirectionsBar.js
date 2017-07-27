@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import helper from '../utils/directionsHelper';
+
 import {
   View,
   ScrollView,
@@ -9,9 +10,12 @@ import {
   Animated,
   Text,
   TouchableOpacity,
-  FlatList
+  FlatList,
+  Modal,
+  TouchableHighlight
 } from 'react-native';
 import { List, ListItem } from "react-native-elements";
+
 // use Animated.event
 // if not, use Animated.timing and state to activate it inside componentDidUpdate
 
@@ -50,7 +54,9 @@ export default class DirectionsBar extends Component {
       textBoxHeight: 40,
       directionsArr: [],
       inputFocus: '',
-      triggerSearch: false
+      triggerSearch: false,
+      arrivalTime: '',
+      modalVisible: false
     }
     this.setOriginText = this.setOriginText.bind(this);
     this.setDestinationText = this.setDestinationText.bind(this);
@@ -58,7 +64,7 @@ export default class DirectionsBar extends Component {
     this.chooseAddress2 = this.chooseAddress2.bind(this);
     this.setA = this.setA.bind(this);
     this.setB = this.setB.bind(this);
-  }
+    }
 
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(position => {
@@ -92,11 +98,14 @@ export default class DirectionsBar extends Component {
 
       helper.getDirections(destinationStr, originStr)
       .then(objArrs => {
+        console.log('Carol Log')
+
         this.setState({
           directionsArr: objArrs.directionsArr,
           showDirections: true,
           showPredictions: false,
-          showInput: false
+          showInput: false,
+          arrivalTime: objArrs.transitDetails[0].departure_time.text
         });
         this.props.updatePolylineCoord(objArrs.stepsArr);
       });
@@ -293,6 +302,7 @@ export default class DirectionsBar extends Component {
   }
 
   render(){
+
     return(
 
       <Animated.View style={{
@@ -308,6 +318,7 @@ export default class DirectionsBar extends Component {
         borderWidth: 0.5,
         borderColor: 'rgb(42, 88, 189)',
         height: this.state.componentHeight}}>
+
         <Animated.View style={{
           height: this.state.directionsHeight,
           flexDirection: 'row',
@@ -399,6 +410,22 @@ export default class DirectionsBar extends Component {
               </View>
             </TouchableOpacity>
         </Animated.View>
+
+        <Modal
+        animationType={"fade"}
+        transparent={true}
+        visible={this.state.modalVisible}
+        >
+          <View>
+            <Text> Hello World!
+            </Text>
+            <TouchableHighlight onPress={()=>{ this.setModalVisible(!this.state.modalVisible)}}>
+              <Text> Hide Modal
+              </Text>
+            </TouchableHighlight>
+          </View>
+        </Modal>
+
       </Animated.View>
 
     )

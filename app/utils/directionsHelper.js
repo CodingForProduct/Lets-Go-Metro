@@ -18,7 +18,7 @@ var helpers = {
       let stepsArr = [];
       let directionsArr = [];
       let transitDetails = [];
-
+      console.log("LEGS", legs)
       legs.forEach(el => {
         if (el.travel_mode === 'TRANSIT'){
           stepsArr.push({
