@@ -108,6 +108,7 @@ export default class DirectionsBar extends Component {
           arrivalTime: objArrs.transitDetails[0].departure_time.text
         });
         this.props.updatePolylineCoord(objArrs.stepsArr);
+        this.props.setMarkers(objArrs.transitDetails, objArrs.stepsArr, objArrs.stepsArr[objArrs.stepsArr.length - 1]);
       });
     }
 
