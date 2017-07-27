@@ -78,9 +78,7 @@ export default class MetroMap extends Component {
       });
     }
   }
-  setModalVisible(){
 
-  }
 
 //TEST
 // [ { lat: 0.00014, lng: 8913.93592 },
