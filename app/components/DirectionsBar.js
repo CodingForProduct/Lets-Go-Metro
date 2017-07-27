@@ -99,6 +99,7 @@ export default class DirectionsBar extends Component {
           showInput: false
         });
         this.props.updatePolylineCoord(objArrs.stepsArr);
+        this.props.setMarkers(objArrs.transitDetails, objArrs.stepsArr, objArrs.stepsArr[objArrs.stepsArr.length - 1]);
       });
     }
 
