@@ -15,10 +15,12 @@ var helpers = {
     }).then(response => {
       let responseData = JSON.parse(response._bodyInit);
       let legs = responseData.routes[0].legs[0].steps;
+      console.log('THIS IS THE LEGS IN HELPER');
+      console.log(legs);
       let stepsArr = [];
       let directionsArr = [];
       let transitDetails = [];
-
+      console.log("LEGS", legs)
       legs.forEach(el => {
         if (el.travel_mode === 'TRANSIT'){
           stepsArr.push({
