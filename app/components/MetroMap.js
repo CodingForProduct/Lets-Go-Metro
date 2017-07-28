@@ -2,10 +2,13 @@ import React, { Component } from 'react';
 import {
   View,
   TouchableOpacity,
+  TouchableHighlight,
   Text,
+  Modal,
   StyleSheet
 } from 'react-native';
 import MapView from 'react-native-maps';
+
 
 const LATITUDE_DELTA = 0.5,
   LONGITUDE_DELTA = 0.45,
@@ -32,7 +35,8 @@ export default class MetroMap extends Component {
 
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(position => {
-      console.log(position);
+      console.log('this is the position ', position);
+      console.log('this is MapView ', MapView)
       this.setState({
         region: {
           latitude: position.coords.latitude,
@@ -74,6 +78,7 @@ export default class MetroMap extends Component {
       });
     }
   }
+
 
 //TEST
 // [ { lat: 0.00014, lng: 8913.93592 },
