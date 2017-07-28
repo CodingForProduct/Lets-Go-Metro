@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import helper from '../utils/directionsHelper';
+
 import {
   View,
   ScrollView,
@@ -9,9 +10,12 @@ import {
   Animated,
   Text,
   TouchableOpacity,
-  FlatList
+  FlatList,
+  Modal,
+  TouchableHighlight
 } from 'react-native';
 import { List, ListItem } from "react-native-elements";
+
 // use Animated.event
 // if not, use Animated.timing and state to activate it inside componentDidUpdate
 
@@ -50,7 +54,9 @@ export default class DirectionsBar extends Component {
       textBoxHeight: 40,
       directionsArr: [],
       inputFocus: '',
-      triggerSearch: false
+      triggerSearch: false,
+      arrivalTime: '',
+      modalVisible: false
     }
     this.setOriginText = this.setOriginText.bind(this);
     this.setDestinationText = this.setDestinationText.bind(this);
@@ -58,7 +64,10 @@ export default class DirectionsBar extends Component {
     this.chooseAddress2 = this.chooseAddress2.bind(this);
     this.setA = this.setA.bind(this);
     this.setB = this.setB.bind(this);
-  }
+    this.setModalVisible = this.setModalVisible.bind(this);
+    this.modalAppear = this.modalAppear.bind(this);
+    this.interval;
+    }
 
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(position => {
@@ -92,12 +101,18 @@ export default class DirectionsBar extends Component {
 
       helper.getDirections(destinationStr, originStr)
       .then(objArrs => {
+        console.log('Carol Log', objArrs.transitDetails[0].departure_time.text)
+
         this.setState({
           directionsArr: objArrs.directionsArr,
           showDirections: true,
           showPredictions: false,
-          showInput: false
+          showInput: false,
+          arrivalTime: objArrs.transitDetails[0].departure_time.text
         });
+
+        //CAROL: CALLING MODAL TO APPEAR - based on busArrivalTime
+        this.setModalVisible(true, objArrs.transitDetails[0].departure_time.text)
         this.props.updatePolylineCoord(objArrs.stepsArr);
         this.props.setMarkers(objArrs.transitDetails, objArrs.stepsArr, objArrs.stepsArr[objArrs.stepsArr.length - 1]);
       });
@@ -292,8 +307,33 @@ export default class DirectionsBar extends Component {
       });
     }
   }
+  modalAppear(){
+    var busArrivalMinute = this.state.arrivalTime.slice(2,4)
+    console.log("busArrivalMinute", busArrivalMinute)
+
+    var theMinsOfCurrentTime = new Date().getMinutes();
+    console.log("theMinsOfCurrentTime", theMinsOfCurrentTime)
+    var timeWithinBusArrival = busArrivalMinute - 7;
+    console.log("timeWithinBusArrival", timeWithinBusArrival)
+    console.log("THIS.INTERVAL", this.interval)
+    if (theMinsOfCurrentTime >= timeWithinBusArrival){
+      this.setState({modalVisible:!this.state.modalVisible});
+      clearInterval(this.interval);
+
+    }
+
+    console.log("ONE STEP CLOSER FOR MANKIND", busArrivalMinute)
+  }
+
+  setModalVisible(visible, busArrivalTime){
+    console.log('INSIDE SETMODALVISIBLE FUNCTION', new Date())
+    console.log('BUSARRIVALTIME', busArrivalTime);
+    this.interval = setInterval(this.modalAppear, 3000);
+    ;
+  }
 
   render(){
+
     return(
 
       <Animated.View style={{
@@ -309,97 +349,138 @@ export default class DirectionsBar extends Component {
         borderWidth: 0.5,
         borderColor: 'rgb(42, 88, 189)',
         height: this.state.componentHeight}}>
+
         <Animated.View style={{
-          height: this.state.directionsHeight,
-          flexDirection: 'row',
-          borderRadius: 4,
-          borderWidth: 0.5,
+         height: this.state.directionsHeight,
+         flexDirection: 'row',
+         borderRadius: 4,
+         borderWidth: 0.5,
 
-          justifyContent: 'center',
-          backgroundColor: '#fff'
-        }}>
-        <ScrollView>
-          <List containerStyle={{marginBottom: 10}}>
-          {
-            this.state.directionsArr.map((item, i) =>(
-             <ListItem
-             key ={i}
-             title ={item.key}
-             />
-            ))
-          }
-          </List>
-          </ScrollView>
-        </Animated.View>
-        <Animated.View style={{
-          height: this.state.inputHeight,
-          flexDirection: 'row',
-          borderRadius: 4,
-          borderWidth: 0.5,
+         justifyContent: 'center',
+         backgroundColor: '#fff'
+       }}>
 
-          justifyContent: 'center',
-        }}>
-          <View style={styles.directionImage}>
-            <Image style={styles.markerImage} source={require('../images/direction_image.png')} />
-          </View>
-          <View style={styles.directionInput}>
-            <TextInput style={{
-              height: this.state.textBoxHeight,
-              borderRadius: 0,
-              borderWidth: 0,
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
-
-              width: 250,
-              paddingLeft: 10
-            }} placeholder="Current Location"
-            value={this.state.originText}
-            onFocus={this.setA}
-            onChangeText={this.setOriginText}
+       <ScrollView>
+         <List containerStyle={{marginBottom: 10}}>
+         {
+           this.state.directionsArr.map((item, i) =>(
+            <ListItem
+            key ={i}
+            title ={item.key}
             />
-            <TextInput style={{
-              height: this.state.textBoxHeight,
-              borderRadius: 0,
-              borderWidth: 0,
-              backgroundColor: "rgba(255, 255, 255, 0.1)",
+           ))
+         }
+         </List>
+         </ScrollView>
+       </Animated.View>
 
-              width: 250,
-              paddingLeft: 10
-            }} placeholder="Destination"
-            placeholderTextColor ="rgba(255, 255, 255, 0.7)"
-            value={this.state.destinationText}
-            onFocus={this.setB}
-            onChangeText={this.setDestinationText}
-            />
+       <Animated.View style={{
+         height: this.state.inputHeight,
+         flexDirection: 'row',
+         borderRadius: 4,
+         borderWidth: 0.5,
+
+         justifyContent: 'center',
+       }}>
+         <View style={styles.directionImage}>
+           <Image style={styles.markerImage} source={require('../images/direction_image.png')} />
+         </View>
+         <View style={styles.directionInput}>
+           <TextInput style={{
+             height: this.state.textBoxHeight,
+             borderRadius: 0,
+             borderWidth: 0,
+             backgroundColor: "rgba(255, 255, 255, 0.1)",
+
+             width: 250,
+             paddingLeft: 10
+           }} placeholder="Current Location"
+           value={this.state.originText}
+           onFocus={this.setA}
+           onChangeText={this.setOriginText}
+           />
+           <TextInput style={{
+             height: this.state.textBoxHeight,
+             borderRadius: 0,
+             borderWidth: 0,
+             backgroundColor: "rgba(255, 255, 255, 0.1)",
+
+             width: 250,
+             paddingLeft: 10
+           }} placeholder="Destination"
+           placeholderTextColor ="rgba(255, 255, 255, 0.7)"
+           value={this.state.destinationText}
+           onFocus={this.setB}
+           onChangeText={this.setDestinationText}
+           />
+         </View>
+       </Animated.View>
+       <Animated.View style={{
+         borderRadius: 0,
+         borderWidth: 0,
+         borderColor: 'blue',
+         justifyContent: 'center',
+         height: this.state.noHeight}}>
+           <TouchableOpacity onPress={this.chooseAddress1} style={{borderWidth: 0,
+
+                 justifyContent: 'center',
+                 height: this.state.noHeightBtn
+             }}>
+             <View>
+               <Text>
+                 {this.state.suggestion1}
+               </Text>
+             </View>
+           </TouchableOpacity>
+           <TouchableOpacity onPress={this.chooseAddress2} style={{
+               justifyContent: 'center',
+               height: this.state.noHeightBtn
+             }}>
+             <View>
+               <Text>
+                 {this.state.suggestion2}
+               </Text>
+             </View>
+           </TouchableOpacity>
+       </Animated.View>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <View style={{marginTop:22}}>
+        <Modal
+        animationType={"fade"}
+        transparent={false}
+        visible={this.state.modalVisible}
+        >
+        <View style = {{marginTop:22}}>
+          <View>
+            <Text> Hello World!
+            </Text>
+            <TouchableHighlight onPress={()=>{ this.setModalVisible(!this.state.modalVisible)}}>
+              <Text> Hide Modal
+              </Text>
+            </TouchableHighlight>
           </View>
-        </Animated.View>
-        <Animated.View style={{
-          borderRadius: 0,
-          borderWidth: 0,
-          borderColor: 'blue',
-          justifyContent: 'center',
-          height: this.state.noHeight}}>
-            <TouchableOpacity onPress={this.chooseAddress1} style={{borderWidth: 0,
-
-                  justifyContent: 'center',
-                  height: this.state.noHeightBtn
-              }}>
-              <View>
-                <Text>
-                  {this.state.suggestion1}
-                </Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this.chooseAddress2} style={{
-                justifyContent: 'center',
-                height: this.state.noHeightBtn
-              }}>
-              <View>
-                <Text>
-                  {this.state.suggestion2}
-                </Text>
-              </View>
-            </TouchableOpacity>
-        </Animated.View>
+          </View>
+        </Modal>
+        <TouchableHighlight onPress={() => { this.setModalVisible(true)}}>
+        <Text> Show Modal</Text>
+        </TouchableHighlight>
+        </View>
       </Animated.View>
 
     )
