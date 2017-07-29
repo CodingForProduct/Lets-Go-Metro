@@ -67,7 +67,27 @@ export default class DirectionsBar extends Component {
     this.setModalVisible = this.setModalVisible.bind(this);
     this.modalAppear = this.modalAppear.bind(this);
     this.interval;
+    this.resetDirections = this.resetDirections.bind(this);
     }
+
+  resetDirections(){
+    console.log('click reset');
+    this.setState({
+      originText: "",
+      destinationText: "",
+      suggestion1: "",
+      suggestion2: "",
+      originSuggestion1: "",
+      originSuggestion2: "",
+      destinationSuggestion1: "",
+      destinationSuggestion2: "",
+      originSelection: "",
+      destinationSelection: "",
+      showPredictions: false,
+      showInput: true,
+      showDirections: false
+    });
+  }
 
   componentDidMount() {
     navigator.geolocation.getCurrentPosition(position => {
@@ -308,25 +328,24 @@ export default class DirectionsBar extends Component {
     }
   }
   modalAppear(){
-    var busArrivalMinute = this.state.arrivalTime.slice(2,4)
-    console.log("busArrivalMinute", busArrivalMinute)
+    var busArrivalMinute = this.state.arrivalTime.slice(2,4);
+    console.log("busArrivalMinute", busArrivalMinute);
 
     var theMinsOfCurrentTime = new Date().getMinutes();
-    console.log("theMinsOfCurrentTime", theMinsOfCurrentTime)
+    console.log("theMinsOfCurrentTime", theMinsOfCurrentTime);
     var timeWithinBusArrival = busArrivalMinute - 7;
-    console.log("timeWithinBusArrival", timeWithinBusArrival)
-    console.log("THIS.INTERVAL", this.interval)
+    console.log("timeWithinBusArrival", timeWithinBusArrival);
+    console.log("THIS.INTERVAL", this.interval);
     if (theMinsOfCurrentTime >= timeWithinBusArrival){
       this.setState({modalVisible:!this.state.modalVisible});
       clearInterval(this.interval);
-
     }
 
     console.log("ONE STEP CLOSER FOR MANKIND", busArrivalMinute)
   }
 
   setModalVisible(visible, busArrivalTime){
-    console.log('INSIDE SETMODALVISIBLE FUNCTION', new Date())
+    console.log('INSIDE SETMODALVISIBLE FUNCTION', new Date());
     console.log('BUSARRIVALTIME', busArrivalTime);
     this.interval = setInterval(this.modalAppear, 3000);
     ;
@@ -352,7 +371,7 @@ export default class DirectionsBar extends Component {
 
         <Animated.View style={{
          height: this.state.directionsHeight,
-         flexDirection: 'row',
+         flexDirection: 'column',
          borderRadius: 4,
          borderWidth: 0.5,
 
@@ -371,7 +390,12 @@ export default class DirectionsBar extends Component {
            ))
          }
          </List>
-         </ScrollView>
+        </ScrollView>
+        <TouchableOpacity style={{height: '30%', borderRadius: 1, borderWidth: 0.5, borderColor: 'black', backgroundColor: 'lightgray', justifyContent: 'center', flexDirection: 'row'}} onPress={this.resetDirections}>
+          <Text>
+            Cancel
+          </Text>
+        </TouchableOpacity>
        </Animated.View>
 
        <Animated.View style={{
@@ -443,21 +467,6 @@ export default class DirectionsBar extends Component {
              </View>
            </TouchableOpacity>
        </Animated.View>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         <View style={{marginTop:22}}>

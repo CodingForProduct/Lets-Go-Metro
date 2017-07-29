@@ -3,16 +3,27 @@ import {
   View,
   Text,
   StyleSheet,
-  Image
+  Image,
+  TouchableOpacity
 } from 'react-native';
 
 export default class Information extends Component {
+
+  constructor(){
+    super();
+    this.resetDirections = this.resetDirections.bind(this);
+  }
+
+  resetDirections(){
+    console.log('click guy');
+  }
+
   render(){
     return (
       <View style={styles.information}>
-        <View style={styles.informationImage}>
+        <TouchableOpacity style={styles.informationImage} onPress={this.resetDirections}>
           <Image style={styles.driverImage} source={require('../images/driver.png')} />
-        </View>
+        </TouchableOpacity>
         <View style={styles.informationText}>
           <Text>
             Hi, I'm Metro Driver. I will help you get where you need to go. Tap me whenever you want to set the directions.
@@ -51,6 +62,9 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     marginTop: 30,
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: 'red'
     // borderRadius: 4,
     // borderWidth: 0.5,
     // borderColor: 'purple',
