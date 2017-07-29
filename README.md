@@ -1,18 +1,23 @@
 ## Let's Go Metro
 
-Let's Go Metro is a mobile application that shows you the relevant transit route for your trip and notifies you when your bus or train is about to leave and when to get off.
+![App Screen](https://github.com/CodingForProduct/Lets-Go-Metro/blob/master/app/images/app-1.png)
+![App Screen](https://github.com/CodingForProduct/Lets-Go-Metro/blob/master/app/images/app-2.png)
+![App Screen](https://github.com/CodingForProduct/Lets-Go-Metro/blob/master/app/images/app-3.png)
+
+Let's Go Metro is a mobile application that shows you the relevant transit route for your trip and notifies you when your bus or train is about to leave and when it is about to arrive.
 
 |Table of Contents|
-|1. Installation|
-|2. Links|
-|3. Team Members|
-|4. Our Approach|
-|5. Technologies Used|
-|6. Bugs and Fixes|
-|7. Icebox|
-|8. Resources| 
+|---|
+|1. [Installation](#installation)|
+|2. [Links](#links)|
+|3. [Team Members](#team)|
+|4. [Our Approach](#approach)|
+|5. [Technologies Used](#technologies)|
+|6. [Bugs and Fixes](#bugs)|
+|7. [Icebox](#icebox)|
+|8. [Resources](#resources)| 
 
-### Installation
+### <a name="installation">Installation</a>
 Running this application on an emulator requires installing several dependencies: Node.js, Watchman, and the React Native CLI.
 ```
 brew install node
@@ -25,24 +30,19 @@ To run on an iOS emulator, you have to install Xcode first. Then run:
 react-native run-ios
 ```
 
-To run on an Android emulator, install Android studio and have an emulator up and running. Then run:
-```
-react-native run-android
-```
-
-### Links
+### <a name="links">Links</a>
 [Github repo](https://github.com/CodingForProduct/Lets-Go-Metro)  
 [Trello board](https://trello.com/b/H8ZakZ6u/ideas)
 
-### Team Members
+### <a name="team">Team Members</a>
 * [Winnie Luk](https://github.com/winniecluk)
 * [Valeriia Tischenko](https://github.com/v1-lab)
 * Honorary Team Member: [Carol Gonzalez](https://github.com/carolag)
 
-### Our Approach
+### <a name="approach">Our Approach</a>
 We were both working with a framework that was completely new to us, so we decided to create something really simple but useful: an application that, given two points, tells you which routes to take, displays when the routes are leaving, and sends you notifications a few minutes before the bus is about to leave or arrive. We wanted to make learning our focal point rather than producing an involved or complicated application.
 
-### Technologies Used
+### <a name="technologies">Technologies Used</a>
 * React Native 0.44.0
 * React 16.0
 * Node 7.0
@@ -51,11 +51,11 @@ We were both working with a framework that was completely new to us, so we decid
 * React Native Maps
 * React Native Elements
 
-### Bugs and Fixes
+### <a name="bugs">Bugs and Fixes</a>
 * The input value for the directions text input was not disappearing even though the animated view container was set to a height of 0, so for a quick fix, we had to clear the value of the input.
 * The dialog box for the pointers sometimes stays on the screen when the user touches it and sometimes will only momentarily flash. This may be a problem with the package.
 
-### Icebox
+### <a name="icebox">Icebox</a>
 * user database to persist previously chosen routes
 * payment to refill TAP card
 * allowing the user to unlock a resource (free access to textbooks or online newspapers during a ride, free access to certain films -- like the entertainment on an airplane ride)
@@ -64,5 +64,5 @@ We were both working with a framework that was completely new to us, so we decid
 * offer several routes
 * track every bus/train needed to reach destination
 
-### Resources
+### <a name="resources">Resources</a>
 [Official React documentation](https://facebook.github.io/react-native/docs/getting-started.html)
