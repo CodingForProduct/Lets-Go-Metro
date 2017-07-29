@@ -417,10 +417,11 @@ export default class DirectionsBar extends Component {
              borderRadius: 0,
              borderWidth: 0,
              backgroundColor: "rgba(255, 255, 255, 0.1)",
-
              width: 250,
-             paddingLeft: 10
+             paddingLeft: 10,
+             color: "rgba(255, 255, 255, 0.7)"
            }} placeholder="Current Location"
+            placeholderTextColor ="rgba(255, 255, 255, 0.7)"
            value={this.state.originText}
            onFocus={this.setA}
            onChangeText={this.setOriginText}
@@ -430,9 +431,9 @@ export default class DirectionsBar extends Component {
              borderRadius: 0,
              borderWidth: 0,
              backgroundColor: "rgba(255, 255, 255, 0.1)",
-
              width: 250,
-             paddingLeft: 10
+             paddingLeft: 10,
+             color: "rgba(255, 255, 255, 0.7)"
            }} placeholder="Destination"
            placeholderTextColor ="rgba(255, 255, 255, 0.7)"
            value={this.state.destinationText}
@@ -448,12 +449,11 @@ export default class DirectionsBar extends Component {
          justifyContent: 'center',
          height: this.state.noHeight}}>
            <TouchableOpacity onPress={this.chooseAddress1} style={{borderWidth: 0,
-
-                 justifyContent: 'center',
-                 height: this.state.noHeightBtn
+              justifyContent: 'center',
+              height: this.state.noHeightBtn
              }}>
              <View>
-               <Text>
+               <Text style={{color: "rgba(255, 255, 255, 0.7)"}}>
                  {this.state.suggestion1}
                </Text>
              </View>
@@ -463,7 +463,7 @@ export default class DirectionsBar extends Component {
                height: this.state.noHeightBtn
              }}>
              <View>
-               <Text>
+               <Text style={{color: "rgba(255, 255, 255, 0.7)"}}>
                  {this.state.suggestion2}
                </Text>
              </View>

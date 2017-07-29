@@ -9,24 +9,15 @@ import {
 
 export default class Information extends Component {
 
-  constructor(){
-    super();
-    this.resetDirections = this.resetDirections.bind(this);
-  }
-
-  resetDirections(){
-    console.log('click guy');
-  }
-
   render(){
     return (
       <View style={styles.information}>
-        <TouchableOpacity style={styles.informationImage} onPress={this.resetDirections}>
+        <View style={styles.informationImage}>
           <Image style={styles.driverImage} source={require('../images/driver.png')} />
-        </TouchableOpacity>
+        </View>
         <View style={styles.informationText}>
           <Text>
-            Hi, I'm Metro Driver. I will help you get where you need to go. Tap me whenever you want to set the directions.
+            Hi, I'm Metro Driver. I will help you get where you need to go.
           </Text>
         </View>
       </View>
@@ -45,9 +36,6 @@ const styles = StyleSheet.create({
     // height: 180,
     flexDirection: 'row',
     // justifyContent: 'center',
-    borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: 'red',
     position: 'absolute',
     left: 0,
     top: 0,
@@ -62,9 +50,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     marginTop: 30,
-    borderRadius: 4,
-    borderWidth: 0.5,
-    borderColor: 'red'
     // borderRadius: 4,
     // borderWidth: 0.5,
     // borderColor: 'purple',
