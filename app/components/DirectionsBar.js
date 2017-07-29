@@ -128,7 +128,9 @@ export default class DirectionsBar extends Component {
           showDirections: true,
           showPredictions: false,
           showInput: false,
-          arrivalTime: objArrs.transitDetails[0].departure_time.text
+          arrivalTime: objArrs.transitDetails[0].departure_time.text,
+          originText: '',
+          destinationText: ''
         });
 
         //CAROL: CALLING MODAL TO APPEAR - based on busArrivalTime
