@@ -85,8 +85,8 @@ export default class MetroMap extends Component {
         <MapView.Marker
         key={idx}
         coordinate={{latitude: el.arrival_stop.location.lat, longitude: el.arrival_stop.location.lng}}
-        title={el.line.name + ', '+ el.arrival_stop.name}
-        description={el.arrival_time.text}
+        title={el.line.name}
+        description={el.arrival_stop.name + ', ' + el.arrival_time.text}
         pinColor="blue"
         />
       );
@@ -97,8 +97,8 @@ export default class MetroMap extends Component {
         <MapView.Marker
         key={idx}
         coordinate={{latitude: el.departure_stop.location.lat, longitude: el.departure_stop.location.lng}}
-        title={el.line.name + ', '+el.departure_stop.name}
-        description={el.departure_time.text}
+        title={el.line.name}
+        description={el.departure_stop.name + ', ' + el.departure_time.text}
         pinColor="green"
         />
       );

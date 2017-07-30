@@ -135,7 +135,7 @@ export default class DirectionsBar extends Component {
         }
 
         // FOR DEMO ONLY: set departureTime to five minutes after current time string, in 'H:mmam' format
-        // departureTimes = ['4:43pm'];
+        // departureTimes = ['12:17pm'];
 
         this.setState({
           directionsArr: objArrs.directionsArr,
@@ -498,7 +498,7 @@ export default class DirectionsBar extends Component {
           <View style={{marginTop:40, paddingTop: 10, backgroundColor: 'white', height: '14%'}}>
             <View style={{flexDirection: 'column', alignItems: 'center', backgroundColor: 'white'}}>
               <Text>
-                Heads up! Bus will be arriving in {Math.floor(this.state.timeBeforeNotification / 60000)} minutes or less.
+                Heads up! Your bus will be arriving in {Math.floor(this.state.timeBeforeNotification / 60000)} minutes or less.
               </Text>
               <TouchableHighlight style={
                 {backgroundColor:'#008800',
