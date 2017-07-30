@@ -79,14 +79,6 @@ export default class MetroMap extends Component {
     }
   }
 
-
-//TEST
-// [ { lat: 0.00014, lng: 8913.93592 },
-//    { lat: 0.00022, lng: 3769.98278 } ]
-
-        // latitude: 34.0498,
-        // longitude: -118.2389,
-
   render(){
     var arrivalPoints = this.props.transitDetails.map((el, idx) =>{
       return(

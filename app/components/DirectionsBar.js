@@ -50,7 +50,6 @@ export default class DirectionsBar extends Component {
       directionsArr: [],
       inputFocus: '',
       triggerSearch: false,
-      arrivalTime: '',
       modalVisible: false,
       departureTimes: [],
       currentMilliseconds: new Date().getTime(),
@@ -63,15 +62,13 @@ export default class DirectionsBar extends Component {
     this.setA = this.setA.bind(this);
     this.setB = this.setB.bind(this);
     this.setModalVisible = this.setModalVisible.bind(this);
-    this.modalAppear = this.modalAppear.bind(this);
-    this.interval;
     this.resetDirections = this.resetDirections.bind(this);
     }
 
   resetDirections(){
     // this.props.setMarkers({
-    //   transitDetails: null,
-    //   stepsArr: null,
+    //   // transitDetails: null,
+    //   stepsArr: [],
     //   lastPt: {latitude: 0, longitude: 0}
     // });
     this.setState({
@@ -91,7 +88,7 @@ export default class DirectionsBar extends Component {
       departureTimes: [],
       modalVisible: false
     });
-    this.props.updatePolylineCoord([{latitude: 0, longitude: 0}]);
+    this.props.updatePolylineCoord([{latitude: 0, longitude: 0}, {latitude: 0, longitude: 0}]);
   }
 
   componentDidMount() {
@@ -138,14 +135,13 @@ export default class DirectionsBar extends Component {
         }
 
         // FOR DEMO ONLY: set departureTime to five minutes after current time string, in 'H:mmam' format
-        departureTimes = ['4:43pm'];
+        // departureTimes = ['4:43pm'];
 
         this.setState({
           directionsArr: objArrs.directionsArr,
           showDirections: true,
           showPredictions: false,
           showInput: false,
-          arrivalTime: objArrs.transitDetails[0].departure_time.text,
           originText: '',
           destinationText: '',
           departureTimes: departureTimes
@@ -343,29 +339,8 @@ export default class DirectionsBar extends Component {
       });
     }
   }
-  modalAppear(){
-    var busArrivalMinute = this.state.arrivalTime.slice(2,4);
-    console.log("busArrivalMinute", busArrivalMinute);
-    var theMinsOfCurrentTime = new Date().getMinutes();
-    console.log("theMinsOfCurrentTime", theMinsOfCurrentTime);
-    var timeWithinBusArrival = busArrivalMinute - 7;
-    console.log("timeWithinBusArrival", timeWithinBusArrival);
-    console.log("THIS.INTERVAL", this.interval);
-    if (theMinsOfCurrentTime >= timeWithinBusArrival){
-      this.setState({modalVisible:!this.state.modalVisible});
-      clearInterval(this.interval);
-    }
-
-    console.log("ONE STEP CLOSER FOR MANKIND", busArrivalMinute)
-  }
 
   setModalVisible(visible, departureTimes){
-    // this should be a setTimeout
-
-    // get the milliseconds of the times
-
-
-    console.log('INSIDE SETMODALVISIBLE FUNCTION', departureTimes);
 
     let departureMs = departureTimes.map(time => {
       var timeArr = time.split(':');
@@ -392,14 +367,9 @@ export default class DirectionsBar extends Component {
 
     for (let i = 0; i < departureMs.length; i++){
       setTimeout(() => {
-        console.log('ARRIVAL NOTICE IS HERE');
         this.setState({modalVisible: true});
       }, departureMs[i]);
     }
-
-
-    // console.log('BUSARRIVALTIME', busArrivalTime);
-    // this.interval = setInterval(this.modalAppear, 3000);
   }
 
   render(){
@@ -531,14 +501,15 @@ export default class DirectionsBar extends Component {
                 Heads up! Bus will be arriving in {Math.floor(this.state.timeBeforeNotification / 60000)} minutes or less.
               </Text>
               <TouchableHighlight style={
-                {backgroundColor:'lightgray',
+                {backgroundColor:'#008800',
                   marginTop: 20,
                   width: '30%',
-                  height: 20,
+                  height: 24,
                   flexDirection: 'row',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  alignItems: 'center'
                   }} onPress={()=>{ this.setState({modalVisible: false})}}>
-                <Text> OK
+                <Text style={{color: 'white'}}> OK
                 </Text>
               </TouchableHighlight>
             </View>

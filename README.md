@@ -57,6 +57,7 @@ We were both working with a framework that was completely new to us, so we decid
 * doesn't zoom out or in to see entire route
 
 ### <a name="icebox">Icebox</a>
+* reset doesn't work completely (map is not recentered on start point)
 * user database to persist previously chosen routes
 * payment to refill TAP card
 * allowing the user to unlock a resource (free access to textbooks or online newspapers during a ride, free access to certain films -- like the entertainment on an airplane ride)

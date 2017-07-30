@@ -26,7 +26,7 @@ export default class letsGoMetro extends Component {
   }
 
   componentDidUpdate(){
-    console.log('THIS IS STATE INSIDE PARENT');
+    console.log('THIS IS STATE INSIDE PARENT GOOGLE GOOGLE MOOGLE SHOOGLE');
     console.log(this.state);
   }
 
@@ -42,11 +42,6 @@ export default class letsGoMetro extends Component {
       stepsArr: stepsArr,
       lastPt: lastPt
     });
-  }
-
-  componentDidUpdate(){
-    console.log('I AM IN PARENT COMPONENT');
-    console.log(this.state);
   }
 
   render() {
