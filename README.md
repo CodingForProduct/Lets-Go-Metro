@@ -33,7 +33,8 @@ react-native run-ios
 
 ### <a name="links">Links</a>
 [Github repo](https://github.com/CodingForProduct/Lets-Go-Metro)  
-[Trello board](https://trello.com/b/H8ZakZ6u/ideas)
+[Trello board](https://trello.com/b/H8ZakZ6u/ideas)  
+[Pitch deck](https://docs.google.com/presentation/d/12PuX33JjcyC0a2zNRF38UAvUnuGjVfEG6d3wJeB6u4Q/edit?usp=sharing)
 
 ### <a name="team">Team Members</a>
 * [Winnie Luk](https://github.com/winniecluk)
@@ -55,10 +56,10 @@ We were both working with a framework that was completely new to us, so we decid
 ### <a name="bugs">Bugs and Fixes</a>
 * The input value for the directions text input was not disappearing even though the animated view container was set to a height of 0, so for a quick fix, we had to clear the value of the input.
 * The dialog box for the pointers sometimes stays on the screen when the user touches it and sometimes will only momentarily flash. This may be a problem with the package.
-* doesn't zoom out or in to see entire route
+* app doesn't automatically zoom out or in to see entire route
+* reset doesn't work completely (map is not recentered on start point)
 
 ### <a name="icebox">Icebox</a>
-* reset doesn't work completely (map is not recentered on start point)
 * user database to persist previously chosen routes
 * payment to refill TAP card
 * allowing the user to unlock a resource (free access to textbooks or online newspapers during a ride, free access to certain films -- like the entertainment on an airplane ride)
