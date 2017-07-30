@@ -16,13 +16,8 @@ import {
 } from 'react-native';
 import { List, ListItem } from "react-native-elements";
 
-// use Animated.event
-// if not, use Animated.timing and state to activate it inside componentDidUpdate
-
 const API_KEY = 'AIzaSyCdPnAPE-Kqy_VWKiFtX8Zm4b0T7wyyZ38',
-  API_PLACES_ROOT = 'https://maps.googleapis.com/maps/api/place/autocomplete/json?key=' + API_KEY,
-  API_GEOCODE_ROOT = 'https://maps.googleapis.com/maps/api/geocode/json?key=' + API_KEY,
-  API_DIRECTIONS_ROOT = 'https://maps.googleapis.com/maps/api/directions/json?key=' + API_KEY + '&mode=transit&unit=imperial';
+  API_GEOCODE_ROOT = 'https://maps.googleapis.com/maps/api/geocode/json?key=' + API_KEY;
 
 // Refactor: dont need originSelection or destinationSelection
 export default class DirectionsBar extends Component {
@@ -55,8 +50,10 @@ export default class DirectionsBar extends Component {
       directionsArr: [],
       inputFocus: '',
       triggerSearch: false,
-      arrivalTime: '',
-      modalVisible: false
+      modalVisible: false,
+      departureTimes: [],
+      currentMilliseconds: new Date().getTime(),
+      timeBeforeNotification: 300000
     }
     this.setOriginText = this.setOriginText.bind(this);
     this.setDestinationText = this.setDestinationText.bind(this);
@@ -65,15 +62,16 @@ export default class DirectionsBar extends Component {
     this.setA = this.setA.bind(this);
     this.setB = this.setB.bind(this);
     this.setModalVisible = this.setModalVisible.bind(this);
-    this.modalAppear = this.modalAppear.bind(this);
-    this.interval;
     this.resetDirections = this.resetDirections.bind(this);
     }
 
   resetDirections(){
-    console.log('click reset');
+    // this.props.setMarkers({
+    //   // transitDetails: null,
+    //   stepsArr: [],
+    //   lastPt: {latitude: 0, longitude: 0}
+    // });
     this.setState({
-      originText: "",
       destinationText: "",
       suggestion1: "",
       suggestion2: "",
@@ -85,8 +83,12 @@ export default class DirectionsBar extends Component {
       destinationSelection: "",
       showPredictions: false,
       showInput: true,
-      showDirections: false
+      showDirections: false,
+      directionsArr: [],
+      departureTimes: [],
+      modalVisible: false
     });
+    this.props.updatePolylineCoord([{latitude: 0, longitude: 0}, {latitude: 0, longitude: 0}]);
   }
 
   componentDidMount() {
@@ -95,9 +97,6 @@ export default class DirectionsBar extends Component {
       fetch(endpt, {
         method: 'GET'
       }).then(response => {
-        // console.log(response);
-        // console.log(typeof response._bodyInit);
-
         this.setState({
           originText: JSON.parse(response._bodyInit).results[0].formatted_address,
           originSelection: JSON.parse(response._bodyInit).results[0].formatted_address,
@@ -110,9 +109,16 @@ export default class DirectionsBar extends Component {
         console.log(err);
       })
     })
+
+    setInterval(function(){
+      this.setState({
+        currentMilliseconds: new Date().getTime()
+      })
+    }.bind(this), 60000)
   }
 
   componentDidUpdate(prevProps, prevState) {
+    console.log(this.state.currentMilliseconds);
     // need to fix below later
     if ((prevState.destinationSelection != this.state.destinationSelection || prevState.originSelection != this.state.originSelection) && (this.state.originText && this.state.destinationSelection)){
       console.log('INSIDE GET ADDRESS IF');
@@ -121,20 +127,28 @@ export default class DirectionsBar extends Component {
 
       helper.getDirections(destinationStr, originStr)
       .then(objArrs => {
-        console.log('Carol Log', objArrs.transitDetails[0].departure_time.text)
+        console.log(objArrs);
+        var departureTimes = [];
+        for (let i = 0; i < objArrs.transitDetails.length; i++){
+          departureTimes.push(objArrs.transitDetails[i].departure_time.text);
+          departureTimes.push(objArrs.transitDetails[i].arrival_time.text);
+        }
+
+        // FOR DEMO ONLY: set departureTime to five minutes after current time string, in 'H:mmam' format
+        // departureTimes = ['4:43pm'];
 
         this.setState({
           directionsArr: objArrs.directionsArr,
           showDirections: true,
           showPredictions: false,
           showInput: false,
-          arrivalTime: objArrs.transitDetails[0].departure_time.text,
           originText: '',
-          destinationText: ''
+          destinationText: '',
+          departureTimes: departureTimes
         });
 
-        //CAROL: CALLING MODAL TO APPEAR - based on busArrivalTime
-        this.setModalVisible(true, objArrs.transitDetails[0].departure_time.text)
+        this.setModalVisible(true, departureTimes);
+
         this.props.updatePolylineCoord(objArrs.stepsArr);
         this.props.setMarkers(objArrs.transitDetails, objArrs.stepsArr, objArrs.stepsArr[objArrs.stepsArr.length - 1]);
       });
@@ -265,7 +279,6 @@ export default class DirectionsBar extends Component {
   }
 
   setDestinationText(text){
-    console.log('INSIDE SET DESTINATION TEXT');
     this.setState({
       destinationText: text,
       showPredictions: true,
@@ -275,14 +288,12 @@ export default class DirectionsBar extends Component {
   }
 
   setA(){
-    console.log('SET A');
     this.setState({
       inputFocus: 'origin'
     });
   }
 
   setB(){
-    console.log('SET B');
     this.setState({
       inputFocus: 'destination'
     });
@@ -290,7 +301,6 @@ export default class DirectionsBar extends Component {
 
   chooseAddress1(){
     if (this.state.inputFocus == 'origin'){
-      console.log('INSIDE ORIGIN CHOOSE ADDRESS 1');
       this.setState({
         originSelection: "suggestion1",
         originText: this.state.originSuggestion1,
@@ -329,28 +339,37 @@ export default class DirectionsBar extends Component {
       });
     }
   }
-  modalAppear(){
-    var busArrivalMinute = this.state.arrivalTime.slice(2,4);
-    console.log("busArrivalMinute", busArrivalMinute);
 
-    var theMinsOfCurrentTime = new Date().getMinutes();
-    console.log("theMinsOfCurrentTime", theMinsOfCurrentTime);
-    var timeWithinBusArrival = busArrivalMinute - 7;
-    console.log("timeWithinBusArrival", timeWithinBusArrival);
-    console.log("THIS.INTERVAL", this.interval);
-    if (theMinsOfCurrentTime >= timeWithinBusArrival){
-      this.setState({modalVisible:!this.state.modalVisible});
-      clearInterval(this.interval);
+  setModalVisible(visible, departureTimes){
+
+    let departureMs = departureTimes.map(time => {
+      var timeArr = time.split(':');
+      if (timeArr[1].includes('pm') && parseInt(timeArr[0]) != 12){
+        timeArr[0] = parseInt(timeArr[0]) + 12;
+      } else if (timeArr[1].includes('am') && parseInt(timeArr[0]) === 12){
+        timeArr[0] = 0;
+      } else {
+        timeArr[0] = parseInt(timeArr[0]);
+      }
+      timeArr[1] = timeArr[1].replace(/[A-Za-z]/g, '');
+      let rightNow = new Date();
+      // later can change settings to make it more or less time before notification
+      let differenceInTime = new Date(rightNow.getFullYear(), rightNow.getMonth(), rightNow.getDate(), timeArr[0], timeArr[1], 0).getTime() - this.state.currentMilliseconds;
+
+      if (differenceInTime < 300000){
+        return 3000;
+      } else {
+        return differenceInTime + this.state.timeBeforeNotification
+      }
+    });
+
+    console.log(departureMs);
+
+    for (let i = 0; i < departureMs.length; i++){
+      setTimeout(() => {
+        this.setState({modalVisible: true});
+      }, departureMs[i]);
     }
-
-    console.log("ONE STEP CLOSER FOR MANKIND", busArrivalMinute)
-  }
-
-  setModalVisible(visible, busArrivalTime){
-    console.log('INSIDE SETMODALVISIBLE FUNCTION', new Date());
-    console.log('BUSARRIVALTIME', busArrivalTime);
-    this.interval = setInterval(this.modalAppear, 3000);
-    ;
   }
 
   render(){
@@ -405,7 +424,6 @@ export default class DirectionsBar extends Component {
          flexDirection: 'row',
          borderRadius: 4,
          borderWidth: 0.5,
-
          justifyContent: 'center',
        }}>
          <View style={styles.directionImage}>
@@ -471,26 +489,32 @@ export default class DirectionsBar extends Component {
        </Animated.View>
 
 
-        <View style={{marginTop:22}}>
-        <Modal
-        animationType={"fade"}
-        transparent={false}
-        visible={this.state.modalVisible}
-        >
-        <View style = {{marginTop:22}}>
-          <View>
-            <Text> Hello World!
-            </Text>
-            <TouchableHighlight onPress={()=>{ this.setModalVisible(!this.state.modalVisible)}}>
-              <Text> Hide Modal
+        <View style={{marginTop:40, height: '20%', paddingTop: 40}}>
+          <Modal
+          animationType={"slide"}
+          transparent={true}
+          visible={this.state.modalVisible}
+          >
+          <View style={{marginTop:40, paddingTop: 10, backgroundColor: 'white', height: '14%'}}>
+            <View style={{flexDirection: 'column', alignItems: 'center', backgroundColor: 'white'}}>
+              <Text>
+                Heads up! Bus will be arriving in {Math.floor(this.state.timeBeforeNotification / 60000)} minutes or less.
               </Text>
-            </TouchableHighlight>
-          </View>
-          </View>
-        </Modal>
-        <TouchableHighlight onPress={() => { this.setModalVisible(true)}}>
-        <Text> Show Modal</Text>
-        </TouchableHighlight>
+              <TouchableHighlight style={
+                {backgroundColor:'#008800',
+                  marginTop: 20,
+                  width: '30%',
+                  height: 24,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                  }} onPress={()=>{ this.setState({modalVisible: false})}}>
+                <Text style={{color: 'white'}}> OK
+                </Text>
+              </TouchableHighlight>
+            </View>
+            </View>
+          </Modal>
         </View>
       </Animated.View>
 

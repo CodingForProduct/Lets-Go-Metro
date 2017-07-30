@@ -79,14 +79,6 @@ export default class MetroMap extends Component {
     }
   }
 
-
-//TEST
-// [ { lat: 0.00014, lng: 8913.93592 },
-//    { lat: 0.00022, lng: 3769.98278 } ]
-
-        // latitude: 34.0498,
-        // longitude: -118.2389,
-
   render(){
     var arrivalPoints = this.props.transitDetails.map((el, idx) =>{
       return(
@@ -133,7 +125,12 @@ export default class MetroMap extends Component {
         <MapView.Marker coordinate={{
               latitude: this.props.lastPt.latitude, longitude: this.props.lastPt.longitude
             }} pinColor="red" />
-          <MapView.Polyline coordinates={this.props.polylineCoord}/>
+          <MapView.Polyline
+            coordinates={this.props.polylineCoord}
+            strokeColor='#FF530D'
+            lineCap='round'
+            strokeWidth={3}
+          />
         </MapView>
       </View>
     );
