@@ -3,6 +3,7 @@
 ![App Screen](https://github.com/CodingForProduct/Lets-Go-Metro/blob/master/app/images/app-1.png)
 ![App Screen](https://github.com/CodingForProduct/Lets-Go-Metro/blob/master/app/images/app-2.png)
 ![App Screen](https://github.com/CodingForProduct/Lets-Go-Metro/blob/master/app/images/app-3.png)
+![App Screen](https://github.com/CodingForProduct/Lets-Go-Metro/blob/master/app/images/app-4.png)
 
 Let's Go Metro is a mobile application that shows you the relevant transit route for your trip and notifies you when your bus or train is about to leave and when it is about to arrive.
 
