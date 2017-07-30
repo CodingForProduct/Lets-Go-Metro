@@ -133,7 +133,12 @@ export default class MetroMap extends Component {
         <MapView.Marker coordinate={{
               latitude: this.props.lastPt.latitude, longitude: this.props.lastPt.longitude
             }} pinColor="red" />
-          <MapView.Polyline coordinates={this.props.polylineCoord}/>
+          <MapView.Polyline
+            coordinates={this.props.polylineCoord}
+            strokeColor='#FF530D'
+            lineCap='round'
+            strokeWidth={3}
+          />
         </MapView>
       </View>
     );

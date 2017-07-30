@@ -25,6 +25,11 @@ export default class letsGoMetro extends Component {
     this.setMarkers = this.setMarkers.bind(this);
   }
 
+  componentDidUpdate(){
+    console.log('THIS IS STATE INSIDE PARENT');
+    console.log(this.state);
+  }
+
   updatePolylineCoord(arr){
     this.setState({
       polylineCoord: arr

@@ -69,8 +69,12 @@ export default class DirectionsBar extends Component {
     }
 
   resetDirections(){
+    // this.props.setMarkers({
+    //   transitDetails: null,
+    //   stepsArr: null,
+    //   lastPt: {latitude: 0, longitude: 0}
+    // });
     this.setState({
-      originText: "",
       destinationText: "",
       suggestion1: "",
       suggestion2: "",
@@ -82,8 +86,12 @@ export default class DirectionsBar extends Component {
       destinationSelection: "",
       showPredictions: false,
       showInput: true,
-      showDirections: false
+      showDirections: false,
+      directionsArr: [],
+      departureTimes: [],
+      modalVisible: false
     });
+    this.props.updatePolylineCoord([{latitude: 0, longitude: 0}]);
   }
 
   componentDidMount() {
@@ -122,7 +130,6 @@ export default class DirectionsBar extends Component {
 
       helper.getDirections(destinationStr, originStr)
       .then(objArrs => {
-        // console.log('Carol Log', objArrs.transitDetails[0].departure_time.text)
         console.log(objArrs);
         var departureTimes = [];
         for (let i = 0; i < objArrs.transitDetails.length; i++){
@@ -131,7 +138,7 @@ export default class DirectionsBar extends Component {
         }
 
         // FOR DEMO ONLY: set departureTime to five minutes after current time string, in 'H:mmam' format
-        departureTimes = ['4:21pm'];
+        departureTimes = ['4:43pm'];
 
         this.setState({
           directionsArr: objArrs.directionsArr,
@@ -144,8 +151,6 @@ export default class DirectionsBar extends Component {
           departureTimes: departureTimes
         });
 
-        //CAROL: CALLING MODAL TO APPEAR - based on busArrivalTime
-        // this.setModalVisible(true, objArrs.transitDetails[0].departure_time.text);
         this.setModalVisible(true, departureTimes);
 
         this.props.updatePolylineCoord(objArrs.stepsArr);
@@ -514,18 +519,25 @@ export default class DirectionsBar extends Component {
        </Animated.View>
 
 
-        <View style={{marginTop:22, height: '20%'}}>
+        <View style={{marginTop:40, height: '20%', paddingTop: 40}}>
           <Modal
           animationType={"slide"}
-          transparent={false}
+          transparent={true}
           visible={this.state.modalVisible}
           >
-          <View style = {{marginTop:22}}>
-            <View style={{justifyContent: 'center'}}>
+          <View style={{marginTop:40, paddingTop: 10, backgroundColor: 'white', height: '14%'}}>
+            <View style={{flexDirection: 'column', alignItems: 'center', backgroundColor: 'white'}}>
               <Text>
-                Heads up! Bus will be arriving soon.
+                Heads up! Bus will be arriving in {Math.floor(this.state.timeBeforeNotification / 60000)} minutes or less.
               </Text>
-              <TouchableHighlight style={{backgroundColor:'lightgray', marginTop: 20}} onPress={()=>{ this.setState({modalVisible: false})}}>
+              <TouchableHighlight style={
+                {backgroundColor:'lightgray',
+                  marginTop: 20,
+                  width: '30%',
+                  height: 20,
+                  flexDirection: 'row',
+                  justifyContent: 'center'
+                  }} onPress={()=>{ this.setState({modalVisible: false})}}>
                 <Text> OK
                 </Text>
               </TouchableHighlight>
